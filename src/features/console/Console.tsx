@@ -10,30 +10,27 @@ import { getQuerier } from "../../services/Querier";
 import { useAppSelector } from "../../app/hooks";
 import { selectedContract } from "../contracts/contractsSlice";
 import styles from "./Console.module.css";
+import { getExecutor } from "../../services/Executor";
+import { selectedAccount } from "../accounts/accountsSlice";
 
 export const Console: FC = () => {
   const contract = useAppSelector(selectedContract);
-  const [query, setQuery] = useState("");
+  const account = useAppSelector(selectedAccount);
+
+  const [message, setMessage] = useState("");
   const [result, setResult] = useState("");
 
   const prettify = async () => {
-    setQuery(JSON.stringify(JSON.parse(query), null, 2));
+    setMessage(JSON.stringify(JSON.parse(message), null, 2));
   };
 
-  const runQuery = async () => {
+  async function run(command: (msgObj: any) => Promise<any>): Promise<void> {
     let result = "";
-    const querier = await getQuerier();
-
-    let queryObj: Record<string, unknown>;
-
     try {
-      if (!contract) throw new Error("No contract selected");
-      queryObj = JSON.parse(query);
-      result = JSON.stringify(
-        await querier.client.queryContractSmart(contract.address, queryObj),
-        null,
-        2
-      );
+      const msgObj = JSON.parse(message);
+      const resObj = await command(msgObj);
+      console.log(resObj);
+      result = JSON.stringify(resObj, null, 2);
     } catch (e) {
       if (e instanceof SyntaxError) {
         result = `Invalid JSON: ${e.message}`;
@@ -45,6 +42,28 @@ export const Console: FC = () => {
     }
 
     setResult(result);
+  }
+
+  const query = async () => {
+    run(async (queryObj) => {
+      if (!contract) throw new Error("No contract selected");
+      const querier = await getQuerier();
+      return querier.client.queryContractSmart(contract.address, queryObj);
+    });
+  };
+
+  const execute = async () => {
+    run(async (executeObj) => {
+      if (!account) throw new Error("No account selected");
+      if (!contract) throw new Error("No contract selected");
+      const executor = await getExecutor(account.mnemonic);
+      return executor.client.execute(
+        account.address,
+        contract.address,
+        executeObj,
+        "auto"
+      );
+    });
   };
 
   return (
@@ -53,16 +72,16 @@ export const Console: FC = () => {
         <Editor
           className={styles.editor}
           highlight={(code) => formatHighlight(code)}
-          placeholder="Your query"
-          value={query}
+          placeholder="Enter JSON query or transaction"
+          value={message}
           padding={10}
-          onValueChange={(code) => setQuery(code)}
+          onValueChange={(code) => setMessage(code)}
         />
         <div className={styles.controls}>
           <SlButtonGroup className={styles.buttons}>
             <SlButton onClick={() => prettify()}>Format</SlButton>
-            <SlButton onClick={() => runQuery()}>Query</SlButton>
-            <SlButton onClick={() => runQuery()}>Execute</SlButton>
+            <SlButton onClick={() => query()}>Query</SlButton>
+            <SlButton onClick={() => execute()}>Execute</SlButton>
           </SlButtonGroup>
         </div>
       </div>

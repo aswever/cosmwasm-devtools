@@ -32,5 +32,7 @@ pre {
   margin: 0;
   padding: 10px;
   background-color: #fafafa;
-  height: 100%;
+  min-height: 100%;
+  word-break: break-word;
+  white-space: pre-wrap;
 }

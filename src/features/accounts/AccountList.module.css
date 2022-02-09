@@ -22,3 +22,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.address.selected::part(:global(base)) {
+  background-color: black;
+  color: white;
+  border-radius: 0.25em;
+}
+
+.address.selected::part(:global(body)):hover {
+  background-color: #555555;
+}

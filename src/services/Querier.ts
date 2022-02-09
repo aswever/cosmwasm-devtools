@@ -3,10 +3,6 @@ import { configService } from "./Config";
 
 export class Querier {
   constructor(public client: CosmWasmClient) {}
-
-  async getContract(address: string) {
-    this.client.getContract(address);
-  }
 }
 
 let querier: Querier;

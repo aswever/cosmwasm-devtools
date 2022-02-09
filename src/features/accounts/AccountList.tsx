@@ -1,7 +1,7 @@
 import { SlCard } from "@shoelace-style/shoelace/dist/react";
 import React, { FC } from "react";
-import { useAppSelector } from "../../app/hooks";
-import { Account } from "./accountsSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { Account, selectAccount } from "./accountsSlice";
 import styles from "./AccountList.module.css";
 import { AddAccount } from "./AddAccount";
 
@@ -10,7 +10,23 @@ interface AccountProps {
 }
 
 export const AccountInfo: FC<AccountProps> = ({ account }) => {
-  return <SlCard className={styles.address}>{account.address}</SlCard>;
+  const dispatch = useAppDispatch();
+  const selected = useAppSelector(
+    (state) => state.accounts.currentAccount === account.address
+  );
+
+  const classes = [styles.address];
+  if (selected) {
+    classes.push(styles.selected);
+  }
+  return (
+    <SlCard
+      className={classes.join(" ")}
+      onClick={() => dispatch(selectAccount(account.address))}
+    >
+      {account.address}
+    </SlCard>
+  );
 };
 
 export const AccountList: FC = () => {
@@ -18,8 +34,8 @@ export const AccountList: FC = () => {
   return (
     <div className={styles.section}>
       <div className={styles.header}>Accounts</div>
-      {accounts.map((account, idx) => (
-        <AccountInfo key={idx} account={account} />
+      {Object.values(accounts).map((account) => (
+        <AccountInfo key={account.address} account={account} />
       ))}
       <AddAccount />
     </div>

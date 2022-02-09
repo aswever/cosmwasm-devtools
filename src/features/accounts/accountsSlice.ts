@@ -9,13 +9,13 @@ export interface Account {
 }
 
 export interface AccountsState {
-  accountList: Account[];
-  currentAccount?: number;
+  accountList: { [key: string]: Account };
+  currentAccount?: string;
   status: "idle" | "loading" | "failed";
 }
 
 const initialState: AccountsState = {
-  accountList: [],
+  accountList: {},
   status: "idle",
 };
 
@@ -46,7 +46,7 @@ export const accountsSlice = createSlice({
   name: "accounts",
   initialState,
   reducers: {
-    selectAccount: (state, action: PayloadAction<number>) => {
+    selectAccount: (state, action: PayloadAction<string>) => {
       state.currentAccount = action.payload;
     },
   },
@@ -57,14 +57,16 @@ export const accountsSlice = createSlice({
       })
       .addCase(generateAccount.fulfilled, (state, action) => {
         state.status = "idle";
-        state.accountList.push(action.payload);
+        const account = action.payload;
+        state.accountList[account.address] = account;
       })
       .addCase(importAccount.pending, (state) => {
         state.status = "loading";
       })
       .addCase(importAccount.fulfilled, (state, action) => {
         state.status = "idle";
-        state.accountList.push(action.payload);
+        const account = action.payload;
+        state.accountList[account.address] = account;
       });
   },
 });

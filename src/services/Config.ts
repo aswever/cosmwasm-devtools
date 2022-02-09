@@ -1,6 +1,8 @@
 const defaultConfig: Record<string, unknown> = {
   rpcEndpoint: "http://localhost:26657",
   addressPrefix: "juno",
+  defaultGas: "1",
+  defaultDenom: "ujunox",
 };
 
 export class Config {
