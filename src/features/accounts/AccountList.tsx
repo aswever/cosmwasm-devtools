@@ -24,7 +24,7 @@ export const AccountInfo: FC<AccountProps> = ({ account }) => {
       className={classes.join(" ")}
       onClick={() => dispatch(selectAccount(account.address))}
     >
-      {account.address}
+      {account.label || account.address}
     </SlCard>
   );
 };

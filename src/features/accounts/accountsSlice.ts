@@ -4,6 +4,7 @@ import { RootState } from "../../app/store";
 import { configService } from "../../services/Config";
 
 export interface Account {
+  label: string;
   mnemonic: string;
   address: string;
 }
@@ -19,26 +20,14 @@ const initialState: AccountsState = {
   status: "idle",
 };
 
-export const generateAccount = createAsyncThunk(
-  "accounts/generate",
-  async () => {
-    const wallet = await DirectSecp256k1HdWallet.generate(12, {
-      prefix: configService.get("addressPrefix"),
-    });
-    const { mnemonic } = wallet;
-    const [{ address }] = await wallet.getAccounts();
-    return { mnemonic, address };
-  }
-);
-
 export const importAccount = createAsyncThunk(
   "accounts/import",
-  async (mnemonic: string) => {
+  async ({ label, mnemonic }: { label: string; mnemonic: string }) => {
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
       prefix: configService.get("addressPrefix"),
     });
     const [{ address }] = await wallet.getAccounts();
-    return { mnemonic, address };
+    return { label, mnemonic, address };
   }
 );
 
@@ -52,14 +41,6 @@ export const accountsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(generateAccount.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(generateAccount.fulfilled, (state, action) => {
-        state.status = "idle";
-        const account = action.payload;
-        state.accountList[account.address] = account;
-      })
       .addCase(importAccount.pending, (state) => {
         state.status = "loading";
       })

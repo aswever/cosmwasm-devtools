@@ -34,7 +34,7 @@ export const ContractDetails: FC<ContractProps> = ({ contract }) => {
       className={classes.join(" ")}
       onClick={() => dispatch(selectContract(contract.address))}
     >
-      {contract.address}
+      {contract.label}
     </SlCard>
   );
 };

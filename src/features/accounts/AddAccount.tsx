@@ -1,6 +1,5 @@
 import {
   SlButton,
-  SlButtonGroup,
   SlCard,
   SlDialog,
   SlIcon,
@@ -10,7 +9,7 @@ import {
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input";
 import React, { FC, useState } from "react";
 import { useAppDispatch } from "../../app/hooks";
-import { generateAccount, importAccount } from "./accountsSlice";
+import { importAccount } from "./accountsSlice";
 import styles from "./AddAccount.module.css";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 
@@ -21,10 +20,12 @@ interface ImportDialogueProps {
 
 export const ImportDialogue: FC<ImportDialogueProps> = ({ open, setOpen }) => {
   const dispatch = useAppDispatch();
+  const [label, setLabel] = useState("");
   const [mnemonic, setMnemonic] = useState("");
 
   function doImport() {
-    dispatch(importAccount(mnemonic));
+    dispatch(importAccount({ label, mnemonic }));
+    setLabel("");
     setMnemonic("");
     setOpen(false);
   }
@@ -41,7 +42,15 @@ export const ImportDialogue: FC<ImportDialogueProps> = ({ open, setOpen }) => {
       open={open}
       onSlAfterHide={() => setOpen(false)}
     >
-      <div className={styles.importGroup}>
+      <div className={styles.form}>
+        <SlInput
+          placeholder="Label"
+          value={label}
+          className={styles.label}
+          onSlChange={(e) =>
+            setLabel((e.target as SlInputElement).value.trim())
+          }
+        />
         <SlInput
           placeholder="Mnemonic"
           value={mnemonic}
@@ -53,11 +62,15 @@ export const ImportDialogue: FC<ImportDialogueProps> = ({ open, setOpen }) => {
           <SlIconButton
             className={styles.generate}
             name="arrow-repeat"
-            slot="prefix"
+            slot="suffix"
             onClick={() => generate()}
           />
         </SlInput>
-        <SlButton className={styles.importButton} onClick={() => doImport()}>
+        <SlButton
+          className={styles.importButton}
+          onClick={() => doImport()}
+          variant="neutral"
+        >
           Add
         </SlButton>
       </div>
