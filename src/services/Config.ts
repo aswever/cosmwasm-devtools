@@ -1,3 +1,8 @@
+const defaultConfig: Record<string, unknown> = {
+  rpcEndpoint: "http://localhost:26657",
+  addressPrefix: "juno",
+};
+
 export class Config {
   constructor(private data: Record<string, unknown> = {}) {}
 
@@ -16,4 +21,4 @@ export class Config {
   }
 }
 
-export const configService = new Config();
+export const configService = new Config(defaultConfig);

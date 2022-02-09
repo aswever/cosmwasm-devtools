@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { RootState } from "../../app/store";
+import { configService } from "../../services/Config";
 
 export interface Account {
   mnemonic: string;
@@ -21,7 +22,9 @@ const initialState: AccountsState = {
 export const generateAccount = createAsyncThunk(
   "accounts/generate",
   async () => {
-    const wallet = await DirectSecp256k1HdWallet.generate();
+    const wallet = await DirectSecp256k1HdWallet.generate(12, {
+      prefix: configService.get("addressPrefix"),
+    });
     const { mnemonic } = wallet;
     const [{ address }] = await wallet.getAccounts();
     return { mnemonic, address };
@@ -31,7 +34,9 @@ export const generateAccount = createAsyncThunk(
 export const importAccount = createAsyncThunk(
   "accounts/import",
   async (mnemonic: string) => {
-    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic);
+    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+      prefix: configService.get("addressPrefix"),
+    });
     const [{ address }] = await wallet.getAccounts();
     return { mnemonic, address };
   }

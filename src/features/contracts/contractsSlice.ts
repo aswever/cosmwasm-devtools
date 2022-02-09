@@ -5,7 +5,7 @@ import { Contract, ContractCodeHistoryEntry } from "@cosmjs/cosmwasm-stargate";
 
 export interface ContractInfo {
   contract: Contract;
-  history: ContractCodeHistoryEntry[];
+  history?: ContractCodeHistoryEntry[];
 }
 
 export interface ContractsState {
@@ -24,9 +24,16 @@ export const addContract = createAsyncThunk(
   async (address: string) => {
     const querier = await getQuerier();
     const contract = await querier.client.getContract(address);
-    const history = (await querier.client.getContractCodeHistory(
-      address
-    )) as ContractCodeHistoryEntry[];
+
+    let history;
+    try {
+      history = (await querier.client.getContractCodeHistory(
+        address
+      )) as ContractCodeHistoryEntry[];
+    } catch (error) {
+      console.log("failed to retrieve contract history", error);
+    }
+
     return { contract, history };
   }
 );
