@@ -1,0 +1,48 @@
+.adder {
+  width: 90%;
+  margin: 0.5rem;
+  cursor: pointer;
+}
+
+.adder::part(:global(body)):hover {
+  background-color: #f5f5f5;
+}
+
+.adder::part(:global(body)) {
+  padding: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plus::part(:global(base)) {
+  margin-top: 0.2rem;
+}
+
+.dialog {
+  z-index: 100;
+}
+
+.importGroup {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.mnemonic {
+  flex-grow: 1;
+}
+
+.mnemonic::part(:global(base)) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.importButton::part(:global(base)) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+}
+
+.generate::part(:global(base)) {
+  margin-left: -0.5em;
+  margin-right: -0.5rem;
+}

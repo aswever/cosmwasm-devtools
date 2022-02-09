@@ -1,39 +1,33 @@
-.App {
-  text-align: center;
+body,
+pre {
+  font-family: "Courier New", Courier, monospace;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-float infinite 3s ease-in-out;
-  }
-}
-
-.App-header {
-  min-height: 100vh;
+.main {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: center;
 }
 
-.App-link {
-  color: rgb(112, 76, 182);
+.sidebar {
+  width: 20%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+  border-right: 1px solid #ccc;
 }
 
-@keyframes App-logo-float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+.console {
+  width: 80%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  right: 0;
+  overflow-x: hidden;
+  z-index: -1;
 }

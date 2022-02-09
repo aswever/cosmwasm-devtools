@@ -1,14 +1,10 @@
-import {
-  SlButton,
-  SlButtonGroup,
-  SlCard,
-} from "@shoelace-style/shoelace/dist/react";
-import React, { FC, useMemo, useState } from "react";
-import { useAppSelector } from "../../app/hooks";
-import { ContractInfo } from "./contractsSlice";
-import Editor from "react-simple-code-editor";
-import formatHighlight from "json-format-highlight";
-import { getQuerier } from "../../services/Querier";
+import { SlCard } from "@shoelace-style/shoelace/dist/react";
+import React, { FC } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectContract } from "./contractsSlice";
+import styles from "./ContractList.module.css";
+import { Contract } from "@cosmjs/cosmwasm-stargate";
+import { AddContract } from "./AddContract";
 
 const customColorOptions = {
   keyColor: "black",
@@ -20,72 +16,25 @@ const customColorOptions = {
 };
 
 interface ContractProps {
-  info: ContractInfo;
+  contract: Contract;
 }
 
-export const ContractDetails: FC<ContractProps> = ({ info }) => {
-  const [query, setQuery] = useState("");
-  const [result, setResult] = useState("");
+export const ContractDetails: FC<ContractProps> = ({ contract }) => {
+  const dispatch = useAppDispatch();
+  const selected = useAppSelector(
+    (state) => state.contracts.currentContract === contract.address
+  );
 
-  const prettify = async () => {
-    setQuery(JSON.stringify(JSON.parse(query), null, 2));
-  };
-
-  const runQuery = async () => {
-    let result = "";
-    const querier = await getQuerier();
-
-    let queryObj: Record<string, unknown>;
-
-    try {
-      queryObj = JSON.parse(query);
-      result = JSON.stringify(
-        await querier.client.queryContractSmart(
-          info.contract.address,
-          queryObj
-        ),
-        null,
-        2
-      );
-    } catch (e) {
-      if (e instanceof SyntaxError) {
-        result = `Invalid JSON: ${e.message}`;
-      } else if (e instanceof Error) {
-        result = `Error: ${e.message}`;
-      } else {
-        result = `Unknown error: ${e}`;
-      }
-    }
-
-    setResult(result);
-  };
-
+  const classes = [styles.address];
+  if (selected) {
+    classes.push(styles.selected);
+  }
   return (
-    <SlCard>
-      <div slot="header">Contract</div>
-      <p>
-        <b>Label</b>: {info.contract.label}
-        <br />
-        <b>Address</b>: {info.contract.address}
-        <br />
-        <b>Creator</b>: {info.contract.creator}
-        <br />
-        <b>Code ID</b>: {info.contract.codeId}
-      </p>
-      <Editor
-        highlight={(code) => formatHighlight(code)}
-        placeholder="Your query"
-        value={query}
-        onValueChange={(code) => setQuery(code)}
-      />
-      <SlButtonGroup>
-        <SlButton onClick={() => runQuery()}>Query</SlButton>
-        <SlButton onClick={() => prettify()}>Format</SlButton>
-      </SlButtonGroup>
-      <pre
-        className="result"
-        dangerouslySetInnerHTML={{ __html: formatHighlight(result) }}
-      />
+    <SlCard
+      className={classes.join(" ")}
+      onClick={() => dispatch(selectContract(contract.address))}
+    >
+      {contract.address}
     </SlCard>
   );
 };
@@ -93,11 +42,12 @@ export const ContractDetails: FC<ContractProps> = ({ info }) => {
 export const ContractList: FC = () => {
   const contracts = useAppSelector((state) => state.contracts.contractList);
   return (
-    <SlCard>
-      <div slot="header">Contracts</div>
-      {contracts.map((contract, idx) => (
-        <ContractDetails key={idx} info={contract} />
+    <div className={styles.section}>
+      <div className={styles.header}>Contracts</div>
+      {Object.values(contracts).map((contract) => (
+        <ContractDetails key={contract.address} contract={contract} />
       ))}
-    </SlCard>
+      <AddContract />
+    </div>
   );
 };

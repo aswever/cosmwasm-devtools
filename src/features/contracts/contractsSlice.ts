@@ -9,13 +9,13 @@ export interface ContractInfo {
 }
 
 export interface ContractsState {
-  contractList: ContractInfo[];
-  currentContract?: number;
+  contractList: { [key: string]: Contract };
+  currentContract?: string;
   status: "idle" | "loading" | "failed";
 }
 
 const initialState: ContractsState = {
-  contractList: [],
+  contractList: {},
   status: "idle",
 };
 
@@ -25,16 +25,18 @@ export const addContract = createAsyncThunk(
     const querier = await getQuerier();
     const contract = await querier.client.getContract(address);
 
+    /* broken method?
     let history;
     try {
       history = (await querier.client.getContractCodeHistory(
         address
       )) as ContractCodeHistoryEntry[];
     } catch (error) {
-      console.log("failed to retrieve contract history", error);
+      console.error("failed to retrieve contract history", error);
     }
+    */
 
-    return { contract, history };
+    return contract;
   }
 );
 
@@ -42,7 +44,7 @@ export const contractsSlice = createSlice({
   name: "contracts",
   initialState,
   reducers: {
-    selectContract: (state, action: PayloadAction<number>) => {
+    selectContract: (state, action: PayloadAction<string>) => {
       state.currentContract = action.payload;
     },
   },
@@ -53,7 +55,8 @@ export const contractsSlice = createSlice({
       })
       .addCase(addContract.fulfilled, (state, action) => {
         state.status = "idle";
-        state.contractList.push(action.payload);
+        const contract = action.payload;
+        state.contractList[contract.address] = contract;
       });
   },
 });

@@ -3,12 +3,16 @@ import {
   SlButtonGroup,
   SlCard,
   SlDialog,
+  SlIcon,
+  SlIconButton,
   SlInput,
 } from "@shoelace-style/shoelace/dist/react";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input";
 import React, { FC, useState } from "react";
 import { useAppDispatch } from "../../app/hooks";
 import { generateAccount, importAccount } from "./accountsSlice";
+import styles from "./AddAccount.module.css";
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 
 interface ImportDialogueProps {
   open: boolean;
@@ -25,34 +29,49 @@ export const ImportDialogue: FC<ImportDialogueProps> = ({ open, setOpen }) => {
     setOpen(false);
   }
 
+  async function generate() {
+    const wallet = await DirectSecp256k1HdWallet.generate(12);
+    const { mnemonic } = wallet;
+    setMnemonic(mnemonic);
+  }
+
   return (
-    <SlDialog label="Import" open={open} onSlAfterHide={() => setOpen(false)}>
-      <SlInput
-        placeholder="Mnemonic"
-        value={mnemonic}
-        onSlChange={(e) =>
-          setMnemonic((e.target as SlInputElement).value.trim())
-        }
-      />
-      <SlButton onClick={() => doImport()}>Import</SlButton>
+    <SlDialog
+      label="Add account"
+      open={open}
+      onSlAfterHide={() => setOpen(false)}
+    >
+      <div className={styles.importGroup}>
+        <SlInput
+          placeholder="Mnemonic"
+          value={mnemonic}
+          className={styles.mnemonic}
+          onSlChange={(e) =>
+            setMnemonic((e.target as SlInputElement).value.trim())
+          }
+        >
+          <SlIconButton
+            className={styles.generate}
+            name="arrow-repeat"
+            slot="prefix"
+            onClick={() => generate()}
+          />
+        </SlInput>
+        <SlButton className={styles.importButton} onClick={() => doImport()}>
+          Add
+        </SlButton>
+      </div>
     </SlDialog>
   );
 };
 
 export const AddAccount: FC = () => {
-  const dispatch = useAppDispatch();
   const [importOpen, setImportOpen] = useState(false);
 
   return (
     <>
-      <SlCard>
-        <div slot="header">Add account</div>
-        <SlButtonGroup>
-          <SlButton onClick={() => dispatch(generateAccount())}>
-            Generate
-          </SlButton>
-          <SlButton onClick={() => setImportOpen(true)}>Import</SlButton>
-        </SlButtonGroup>
+      <SlCard className={styles.adder} onClick={() => setImportOpen(true)}>
+        <SlIcon name="plus-lg" className={styles.plus} /> Add account
       </SlCard>
       <ImportDialogue open={importOpen} setOpen={setImportOpen} />
     </>
