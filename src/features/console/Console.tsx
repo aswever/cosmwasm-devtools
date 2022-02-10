@@ -10,7 +10,7 @@ import { getQuerier } from "../../services/Querier";
 import { useAppSelector } from "../../app/hooks";
 import { selectedContract } from "../contracts/contractsSlice";
 import styles from "./Console.module.css";
-import { getClient } from "../../services/getClient";
+import { getClient, ClientType } from "../../services/getClient";
 import { selectedAccount } from "../accounts/accountsSlice";
 import { useKeplr } from "../../hooks/useKeplr";
 
@@ -68,8 +68,11 @@ export const Console: FC = () => {
       if (!account) throw new Error("No account selected");
       if (!contract) throw new Error("No contract selected");
 
-      const client = await getClient(account, keplr);
-      return client.execute(
+      const connection = await getClient(account, keplr);
+      if (connection.clientType !== ClientType.Signing)
+        throw new Error("Failed to get signing client");
+
+      return connection.client.execute(
         account.address,
         contract.address,
         executeObj,

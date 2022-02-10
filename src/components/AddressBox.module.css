@@ -1,0 +1,81 @@
+.addressBox {
+  width: 90%;
+  margin: 0.2rem 0.5rem;
+  cursor: pointer;
+}
+
+.addressBox::part(:global(body)):hover {
+  background-color: #f5f5f5;
+}
+
+.addressBox::part(:global(body)) {
+  padding: 0.5rem;
+}
+
+.addressBox .main,
+.addressBox .details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.addressBox .details {
+  margin-top: 0.5em;
+  font-size: 0.8em;
+}
+
+.addressBox .details .balance {
+  margin-left: 1em;
+}
+
+.addressBox .label,
+.addressBox .address {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.addressBox.selected::part(:global(base)) {
+  background-color: black;
+  color: white;
+}
+
+.addressBox.selected::part(:global(body)):hover {
+  background-color: #333;
+}
+
+.addressBox .left {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.close {
+  contain: none;
+  flex-shrink: 0;
+  margin-left: 0.5em;
+}
+
+.close::part(:global(base)) {
+  margin-top: 0.1rem;
+}
+
+.close::part(:global(base)):hover {
+  color: lightcoral;
+}
+
+.dialog {
+  z-index: 100;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 8rem;
+  margin-top: -1rem;
+  margin-bottom: 0.5rem;
+}
+
+.generate::part(:global(base)) {
+  margin-left: -0.5em;
+  margin-right: -0.5rem;
+}

@@ -1,4 +1,3 @@
-import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
 import React, { FC } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
@@ -10,6 +9,7 @@ import {
 import styles from "./AccountList.module.css";
 import { AddAccount } from "./AddAccount";
 import { KeplrAccount } from "./KeplrAccount";
+import { AddressBox } from "../../components/AddressBox";
 
 interface AccountProps {
   account: Account;
@@ -27,17 +27,13 @@ export const AccountInfo: FC<AccountProps> = ({ account }) => {
   }
 
   return (
-    <SlCard
-      className={classes.join(" ")}
+    <AddressBox
+      label={account?.label ?? account?.address}
+      account={account}
+      selected={selected}
       onClick={() => dispatch(selectAccount(account.address))}
-    >
-      <div className={styles.label}>{account.label || account.address}</div>
-      <SlIcon
-        name="x-lg"
-        className={styles.close}
-        onClick={() => dispatch(deleteAccount(account.address))}
-      />
-    </SlCard>
+      onClickX={() => dispatch(deleteAccount(account.address))}
+    />
   );
 };
 
