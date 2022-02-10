@@ -56,6 +56,9 @@ export const accountsSlice = createSlice({
     selectAccount: (state, action: PayloadAction<string | undefined>) => {
       state.currentAccount = action.payload;
     },
+    deleteAccount: (state, action: PayloadAction<string>) => {
+      delete state.accountList[action.payload];
+    },
     setKeplrAccount: (state, action: PayloadAction<Account | undefined>) => {
       const account = action.payload;
 
@@ -81,7 +84,8 @@ export const accountsSlice = createSlice({
   },
 });
 
-export const { selectAccount, setKeplrAccount } = accountsSlice.actions;
+export const { selectAccount, deleteAccount, setKeplrAccount } =
+  accountsSlice.actions;
 
 export const selectedAccount = (state: RootState) =>
   state.accounts.currentAccount !== undefined

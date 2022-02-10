@@ -19,8 +19,13 @@
 
 .address::part(:global(body)) {
   padding: 0.5rem;
+  display: flex;
+}
+
+.address .label {
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-grow: 1;
 }
 
 .address.selected::part(:global(base)) {
@@ -31,4 +36,18 @@
 
 .address.selected::part(:global(body)):hover {
   background-color: #555555;
+}
+
+.close {
+  contain: none;
+  flex-shrink: 0;
+  float: right;
+}
+
+.close::part(:global(base)) {
+  margin-top: 0.1rem;
+}
+
+.close::part(:global(base)):hover {
+  color: lightcoral;
 }

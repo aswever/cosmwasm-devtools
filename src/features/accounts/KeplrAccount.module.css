@@ -10,6 +10,25 @@
 
 .keplr::part(:global(body)) {
   padding: 0.5rem;
+}
+
+.keplr .main,
+.keplr .details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.keplr .details {
+  margin-top: 0.5em;
+  font-size: 0.8em;
+}
+
+.keplr .details .balance {
+  margin-left: 1em;
+}
+
+.keplr .label,
+.keplr .address {
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -23,13 +42,17 @@
   background-color: #333;
 }
 
+.keplr .left {
+  display: flex;
+  flex-grow: 1;
+}
+
 .close {
-  float: right;
   contain: none;
 }
 
 .close::part(:global(base)) {
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
 }
 
 .close::part(:global(base)):hover {
@@ -42,7 +65,7 @@
 }
 
 .wallet::part(:global(base)) {
-  margin-top: 0.2rem;
+  margin-top: 0.1rem;
   contain: none;
 }
 

@@ -1,7 +1,12 @@
-import { SlCard } from "@shoelace-style/shoelace/dist/react";
+import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
 import React, { FC } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { Account, selectAccount, standardAccounts } from "./accountsSlice";
+import {
+  Account,
+  deleteAccount,
+  selectAccount,
+  standardAccounts,
+} from "./accountsSlice";
 import styles from "./AccountList.module.css";
 import { AddAccount } from "./AddAccount";
 import { KeplrAccount } from "./KeplrAccount";
@@ -26,7 +31,12 @@ export const AccountInfo: FC<AccountProps> = ({ account }) => {
       className={classes.join(" ")}
       onClick={() => dispatch(selectAccount(account.address))}
     >
-      {account.label || account.address}
+      <div className={styles.label}>{account.label || account.address}</div>
+      <SlIcon
+        name="x-lg"
+        className={styles.close}
+        onClick={() => dispatch(deleteAccount(account.address))}
+      />
     </SlCard>
   );
 };
