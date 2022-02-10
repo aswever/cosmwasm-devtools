@@ -49,6 +49,7 @@
     ]
   },
   "devDependencies": {
+    "@keplr-wallet/types": "^0.9.12",
     "craco": "^0.0.3",
     "webpack": "^5.68.0"
   }

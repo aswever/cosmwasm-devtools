@@ -10,12 +10,23 @@ import { getQuerier } from "../../services/Querier";
 import { useAppSelector } from "../../app/hooks";
 import { selectedContract } from "../contracts/contractsSlice";
 import styles from "./Console.module.css";
-import { getExecutor } from "../../services/Executor";
+import { getClient } from "../../services/getClient";
 import { selectedAccount } from "../accounts/accountsSlice";
+import { useKeplr } from "../../hooks/useKeplr";
+
+const highlightColors = {
+  keyColor: "black",
+  numberColor: "blue",
+  stringColor: "#0B7500",
+  trueColor: "#00cc00",
+  falseColor: "#ff8080",
+  nullColor: "cornflowerblue",
+};
 
 export const Console: FC = () => {
   const contract = useAppSelector(selectedContract);
   const account = useAppSelector(selectedAccount);
+  const { keplr } = useKeplr();
 
   const [message, setMessage] = useState("");
   const [result, setResult] = useState("");
@@ -56,8 +67,9 @@ export const Console: FC = () => {
     run(async (executeObj) => {
       if (!account) throw new Error("No account selected");
       if (!contract) throw new Error("No contract selected");
-      const executor = await getExecutor(account.mnemonic);
-      return executor.client.execute(
+
+      const client = await getClient(account, keplr);
+      return client.execute(
         account.address,
         contract.address,
         executeObj,
@@ -71,7 +83,7 @@ export const Console: FC = () => {
       <div slot="start" className={styles.input}>
         <Editor
           className={styles.editor}
-          highlight={(code) => formatHighlight(code)}
+          highlight={(code) => formatHighlight(code, highlightColors)}
           placeholder="Enter JSON query or transaction"
           value={message}
           padding={10}
@@ -88,7 +100,9 @@ export const Console: FC = () => {
       <div slot="end" className={styles.output}>
         <pre
           className={styles.result}
-          dangerouslySetInnerHTML={{ __html: formatHighlight(result) }}
+          dangerouslySetInnerHTML={{
+            __html: formatHighlight(result, highlightColors),
+          }}
         />
       </div>
     </SlSplitPanel>

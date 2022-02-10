@@ -1,0 +1,65 @@
+.keplr {
+  width: 90%;
+  margin: 0.2rem 0.5rem;
+  cursor: pointer;
+}
+
+.keplr::part(:global(body)):hover {
+  background-color: #f5f5f5;
+}
+
+.keplr::part(:global(body)) {
+  padding: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.keplr.selected::part(:global(base)) {
+  background-color: black;
+  color: white;
+}
+
+.keplr.selected::part(:global(body)):hover {
+  background-color: #333;
+}
+
+.close {
+  float: right;
+  contain: none;
+}
+
+.close::part(:global(base)) {
+  margin-top: 0.15rem;
+}
+
+.close::part(:global(base)):hover {
+  color: lightcoral;
+}
+
+.wallet {
+  margin-right: 0.5rem;
+  contain: none;
+}
+
+.wallet::part(:global(base)) {
+  margin-top: 0.2rem;
+  contain: none;
+}
+
+.dialog {
+  z-index: 100;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 8rem;
+  margin-top: -1rem;
+  margin-bottom: 0.5rem;
+}
+
+.generate::part(:global(base)) {
+  margin-left: -0.5em;
+  margin-right: -0.5rem;
+}

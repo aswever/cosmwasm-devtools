@@ -1,9 +1,10 @@
 import { SlCard } from "@shoelace-style/shoelace/dist/react";
 import React, { FC } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { Account, selectAccount } from "./accountsSlice";
+import { Account, selectAccount, standardAccounts } from "./accountsSlice";
 import styles from "./AccountList.module.css";
 import { AddAccount } from "./AddAccount";
+import { KeplrAccount } from "./KeplrAccount";
 
 interface AccountProps {
   account: Account;
@@ -19,6 +20,7 @@ export const AccountInfo: FC<AccountProps> = ({ account }) => {
   if (selected) {
     classes.push(styles.selected);
   }
+
   return (
     <SlCard
       className={classes.join(" ")}
@@ -30,10 +32,11 @@ export const AccountInfo: FC<AccountProps> = ({ account }) => {
 };
 
 export const AccountList: FC = () => {
-  const accounts = useAppSelector((state) => state.accounts.accountList);
+  const accounts = useAppSelector(standardAccounts);
   return (
     <div className={styles.section}>
       <div className={styles.header}>Accounts</div>
+      <KeplrAccount />
       {Object.values(accounts).map((account) => (
         <AccountInfo key={account.address} account={account} />
       ))}
