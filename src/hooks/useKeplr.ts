@@ -2,7 +2,10 @@ import { Keplr } from "@keplr-wallet/types";
 import { useCallback, useEffect, useState } from "react";
 import { configService } from "../services/Config";
 import { useAppDispatch } from "../app/hooks";
-import { setKeplrAccount } from "../features/accounts/accountsSlice";
+import {
+  AccountType,
+  setKeplrAccount,
+} from "../features/accounts/accountsSlice";
 
 const CosmosCoinType = 118;
 const GasPrices = {
@@ -57,7 +60,7 @@ export function useKeplr(): {
       configService.get("chainId")
     );
 
-    dispatch(setKeplrAccount({ label, address, type: "keplr" }));
+    dispatch(setKeplrAccount({ label, address, type: AccountType.Keplr }));
   }, [keplr, dispatch]);
 
   const suggestChain = useCallback(async (): Promise<void> => {

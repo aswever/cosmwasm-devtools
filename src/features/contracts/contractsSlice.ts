@@ -1,12 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { getQuerier } from "../../services/Querier";
-import { Contract, ContractCodeHistoryEntry } from "@cosmjs/cosmwasm-stargate";
-
-export interface ContractInfo {
-  contract: Contract;
-  history?: ContractCodeHistoryEntry[];
-}
+import { AccountType, Contract } from "../accounts/accountsSlice";
 
 export interface ContractsState {
   contractList: { [key: string]: Contract };
@@ -21,7 +16,7 @@ const initialState: ContractsState = {
 
 export const addContract = createAsyncThunk(
   "contracts/add",
-  async (address: string) => {
+  async (address: string): Promise<Contract> => {
     const querier = await getQuerier();
     const contract = await querier.client.getContract(address);
 
@@ -36,7 +31,9 @@ export const addContract = createAsyncThunk(
     }
     */
 
-    return contract;
+    const { label } = contract;
+
+    return { type: AccountType.Contract, address, label, contract };
   }
 );
 
@@ -46,6 +43,9 @@ export const contractsSlice = createSlice({
   reducers: {
     selectContract: (state, action: PayloadAction<string>) => {
       state.currentContract = action.payload;
+    },
+    deleteContract: (state, action: PayloadAction<string>) => {
+      delete state.contractList[action.payload];
     },
   },
   extraReducers: (builder) => {
@@ -61,7 +61,7 @@ export const contractsSlice = createSlice({
   },
 });
 
-export const { selectContract } = contractsSlice.actions;
+export const { selectContract, deleteContract } = contractsSlice.actions;
 
 export const selectedContract = (state: RootState) =>
   state.contracts.currentContract !== undefined

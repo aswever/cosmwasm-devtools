@@ -1,19 +1,10 @@
-import { SlCard } from "@shoelace-style/shoelace/dist/react";
 import React, { FC } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { selectContract } from "./contractsSlice";
+import { deleteContract, selectContract } from "./contractsSlice";
 import styles from "./ContractList.module.css";
-import { Contract } from "@cosmjs/cosmwasm-stargate";
 import { AddContract } from "./AddContract";
-
-const customColorOptions = {
-  keyColor: "black",
-  numberColor: "blue",
-  stringColor: "#0B7500",
-  trueColor: "#00cc00",
-  falseColor: "#ff8080",
-  nullColor: "cornflowerblue",
-};
+import { AddressBox } from "../../components/AddressBox";
+import { Contract } from "../accounts/accountsSlice";
 
 interface ContractProps {
   contract: Contract;
@@ -25,17 +16,14 @@ export const ContractDetails: FC<ContractProps> = ({ contract }) => {
     (state) => state.contracts.currentContract === contract.address
   );
 
-  const classes = [styles.address];
-  if (selected) {
-    classes.push(styles.selected);
-  }
   return (
-    <SlCard
-      className={classes.join(" ")}
+    <AddressBox
+      label={contract.label || contract.address}
+      account={contract}
+      selected={selected}
       onClick={() => dispatch(selectContract(contract.address))}
-    >
-      {contract.label}
-    </SlCard>
+      onClickX={() => dispatch(deleteContract(contract.address))}
+    />
   );
 };
 

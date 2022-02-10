@@ -12,7 +12,13 @@ pre {
   align-items: center;
 }
 
+.header {
+  font-family: "Courier New", Courier, monospace;
+  text-align: center;
+}
+
 .sidebar {
+  font-family: Arial, Helvetica, sans-serif;
   width: 20%;
   height: 100%;
   position: fixed;

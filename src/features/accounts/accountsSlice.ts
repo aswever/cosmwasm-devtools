@@ -2,23 +2,35 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { RootState } from "../../app/store";
 import { configService } from "../../services/Config";
+import { Contract as CosmWasmContract } from "@cosmjs/cosmwasm-stargate";
+
+export enum AccountType {
+  Basic,
+  Keplr,
+  Contract,
+}
 
 export interface BaseAccount {
-  type: string;
+  type: AccountType;
   label: string;
   address: string;
 }
 
 export interface KeplrAccount extends BaseAccount {
-  type: "keplr";
+  type: AccountType.Keplr;
 }
 
-export interface StandardAccount extends BaseAccount {
-  type: "standard";
+export interface BasicAccount extends BaseAccount {
+  type: AccountType.Basic;
   mnemonic: string;
 }
 
-export type Account = KeplrAccount | StandardAccount;
+export interface Contract extends BaseAccount {
+  type: AccountType.Contract;
+  contract: CosmWasmContract;
+}
+
+export type Account = KeplrAccount | BasicAccount | Contract;
 
 export interface AccountsState {
   accountList: { [key: string]: Account };
@@ -40,12 +52,12 @@ export const importAccount = createAsyncThunk(
   }: {
     label: string;
     mnemonic: string;
-  }): Promise<StandardAccount> => {
+  }): Promise<BasicAccount> => {
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
       prefix: configService.get("addressPrefix"),
     });
     const [{ address }] = await wallet.getAccounts();
-    return { label, mnemonic, address, type: "standard" };
+    return { label, mnemonic, address, type: AccountType.Basic };
   }
 );
 
@@ -92,9 +104,9 @@ export const selectedAccount = (state: RootState) =>
     ? state.accounts.accountList[state.accounts.currentAccount]
     : undefined;
 
-export const standardAccounts = (state: RootState) =>
+export const basicAccounts = (state: RootState) =>
   Object.values(state.accounts.accountList).filter(
-    (account) => account.type === "standard"
+    (account) => account.type === AccountType.Basic
   );
 
 export default accountsSlice.reducer;

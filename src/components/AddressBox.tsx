@@ -1,7 +1,7 @@
 import { Keplr } from "@keplr-wallet/types";
 import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
 import React, { FC, useCallback, useEffect, useState } from "react";
-import { Account } from "../features/accounts/accountsSlice";
+import { Account, AccountType } from "../features/accounts/accountsSlice";
 import { configService } from "../services/Config";
 import { getClient } from "../services/getClient";
 import { fromMicroCoin, fromMicroDenom } from "../util/coins";
@@ -54,6 +54,9 @@ export const AddressBox: FC<AddressBoxProps> = ({
           {icon}
           <div className={styles.label}>{label}</div>
         </div>
+        {account?.type !== AccountType.Contract && selected && (
+          <SlIcon name="send" className={styles.close} onClick={onClickX} />
+        )}
         {account && (
           <SlIcon name="x-lg" className={styles.close} onClick={onClickX} />
         )}

@@ -14,7 +14,7 @@ function App() {
   return (
     <div className="main">
       <aside className="sidebar">
-        <h3 style={{ textAlign: "center" }}>cosmwasm.tools</h3>
+        <h3 className="header">cosmwasm devtools</h3>
         <SlDivider />
         <AccountList />
         <SlDivider />

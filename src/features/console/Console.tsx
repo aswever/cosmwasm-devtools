@@ -29,7 +29,7 @@ export const Console: FC = () => {
   const { keplr } = useKeplr();
 
   const [message, setMessage] = useState("");
-  const [result, setResult] = useState("");
+  const [result, setResult] = useState("Response will appear here");
 
   const prettify = async () => {
     setMessage(JSON.stringify(JSON.parse(message), null, 2));
@@ -87,7 +87,7 @@ export const Console: FC = () => {
         <Editor
           className={styles.editor}
           highlight={(code) => formatHighlight(code, highlightColors)}
-          placeholder="Enter JSON query or transaction"
+          placeholder="Enter JSON message"
           value={message}
           padding={10}
           onValueChange={(code) => setMessage(code)}

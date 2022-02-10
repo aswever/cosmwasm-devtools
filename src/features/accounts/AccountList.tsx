@@ -4,7 +4,7 @@ import {
   Account,
   deleteAccount,
   selectAccount,
-  standardAccounts,
+  basicAccounts,
 } from "./accountsSlice";
 import styles from "./AccountList.module.css";
 import { AddAccount } from "./AddAccount";
@@ -21,11 +21,6 @@ export const AccountInfo: FC<AccountProps> = ({ account }) => {
     (state) => state.accounts.currentAccount === account.address
   );
 
-  const classes = [styles.address];
-  if (selected) {
-    classes.push(styles.selected);
-  }
-
   return (
     <AddressBox
       label={account?.label ?? account?.address}
@@ -38,7 +33,7 @@ export const AccountInfo: FC<AccountProps> = ({ account }) => {
 };
 
 export const AccountList: FC = () => {
-  const accounts = useAppSelector(standardAccounts);
+  const accounts = useAppSelector(basicAccounts);
   return (
     <div className={styles.section}>
       <div className={styles.header}>Accounts</div>

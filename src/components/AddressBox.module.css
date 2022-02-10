@@ -25,8 +25,16 @@
 
 .addressBox .details .balance {
   margin-left: 1em;
+  color: #88c;
 }
 
+.addressBox .label {
+  font-weight: bold;
+}
+
+.addressBox .address {
+  color: #bbb;
+}
 .addressBox .label,
 .addressBox .address {
   overflow: hidden;
