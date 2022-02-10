@@ -6,6 +6,7 @@ import {
   AccountType,
   setKeplrAccount,
 } from "../features/accounts/accountsSlice";
+import { getKeplr } from "../services/getClient";
 
 const CosmosCoinType = 118;
 const GasPrices = {
@@ -16,55 +17,21 @@ const GasPrices = {
 
 export function useKeplr(): {
   connect: () => Promise<void>;
-  keplr: Keplr | undefined;
 } {
   const dispatch = useAppDispatch();
-  const [keplr, setKeplr] = useState<Keplr>();
-
-  useEffect(() => {
-    connectKeplr();
-  });
-
-  const connectKeplr = useCallback(async (): Promise<void> => {
-    setKeplr(await getKeplr());
-  }, [setKeplr]);
-
-  async function getKeplr(): Promise<Keplr | undefined> {
-    if (window.keplr) {
-      return window.keplr;
-    }
-
-    if (document.readyState === "complete") {
-      return window.keplr;
-    }
-
-    return new Promise((resolve) => {
-      const documentStateChange = (event: Event) => {
-        if (
-          event.target &&
-          (event.target as Document).readyState === "complete"
-        ) {
-          resolve(window.keplr);
-          document.removeEventListener("readystatechange", documentStateChange);
-        }
-      };
-
-      document.addEventListener("readystatechange", documentStateChange);
-    });
-  }
 
   const getAccount = useCallback(async (): Promise<void> => {
-    if (!keplr) return;
+    const keplr = await getKeplr();
 
     const { name: label, bech32Address: address } = await keplr.getKey(
       configService.get("chainId")
     );
 
     dispatch(setKeplrAccount({ label, address, type: AccountType.Keplr }));
-  }, [keplr, dispatch]);
+  }, [dispatch]);
 
   const suggestChain = useCallback(async (): Promise<void> => {
-    if (!keplr) return;
+    const keplr = await getKeplr();
 
     const coin: string = configService.get("coinName");
     const coinDecimals = Number.parseInt(configService.get("coinDecimals"));
@@ -117,12 +84,12 @@ export function useKeplr(): {
       coinType: CosmosCoinType,
       gasPriceStep: GasPrices,
     });
-  }, [keplr]);
+  }, []);
 
   const connect = useCallback(async (): Promise<void> => {
     await getAccount();
     await suggestChain();
   }, [getAccount, suggestChain]);
 
-  return { connect, keplr };
+  return { connect };
 }

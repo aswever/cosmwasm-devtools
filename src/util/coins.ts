@@ -9,6 +9,14 @@ export function fromMicroCoin(coin: Coin): Coin {
   };
 }
 
+export function toMicroCoin(coin: Coin): Coin {
+  const coinDecimals = Number.parseInt(configService.get("coinDecimals"));
+  return {
+    amount: String(Number.parseInt(coin.amount) * Math.pow(10, coinDecimals)),
+    denom: toMicroDenom(coin.denom),
+  };
+}
+
 export function fromMicroDenom(udenom: string): string {
   return udenom.replace("u", "");
 }

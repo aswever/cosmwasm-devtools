@@ -8,7 +8,7 @@ import styles from "./KeplrAccount.module.css";
 
 export const KeplrAccount: FC = () => {
   const dispatch = useAppDispatch();
-  const { connect, keplr } = useKeplr();
+  const { connect } = useKeplr();
   const account = useAppSelector((state) => state.accounts.keplrAccount);
   const selected = useAppSelector(
     (state) => state.accounts.currentAccount === account?.address
@@ -17,7 +17,6 @@ export const KeplrAccount: FC = () => {
   return (
     <AddressBox
       icon={<SlIcon name="wallet2" className={styles.wallet} />}
-      keplr={keplr}
       label={account?.label ?? "Connect wallet"}
       account={account}
       selected={selected}

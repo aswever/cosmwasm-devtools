@@ -3,6 +3,8 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { RootState } from "../../app/store";
 import { configService } from "../../services/Config";
 import { Contract as CosmWasmContract } from "@cosmjs/cosmwasm-stargate";
+import { ClientType, getClient } from "../../services/getClient";
+import { toMicroCoin } from "../../util/coins";
 
 export enum AccountType {
   Basic,
@@ -37,11 +39,13 @@ export interface AccountsState {
   keplrAccount?: Account;
   currentAccount?: string;
   status: "idle" | "loading" | "failed";
+  messages: string[];
 }
 
 const initialState: AccountsState = {
   accountList: {},
   status: "idle",
+  messages: [],
 };
 
 export const importAccount = createAsyncThunk(
@@ -58,6 +62,45 @@ export const importAccount = createAsyncThunk(
     });
     const [{ address }] = await wallet.getAccounts();
     return { label, mnemonic, address, type: AccountType.Basic };
+  }
+);
+
+export const sendCoins = createAsyncThunk(
+  "accounts/sendCoins",
+  async (
+    {
+      sender,
+      recipient,
+      amount,
+      memo,
+    }: {
+      sender: string;
+      recipient: string;
+      amount: string;
+      memo?: string;
+    },
+    { getState }
+  ): Promise<boolean> => {
+    const state = getState() as RootState;
+    const senderAccount = state.accounts.accountList[sender];
+    const connection = await getClient(senderAccount);
+    if (connection.clientType !== ClientType.Signing) {
+      throw new Error("Client is not a signing client");
+    }
+
+    const coinsAmount = [
+      toMicroCoin({ amount, denom: configService.get("coinName") }),
+    ];
+
+    const response = await connection.client.sendTokens(
+      sender,
+      recipient,
+      coinsAmount,
+      "auto",
+      memo
+    );
+    console.log(JSON.stringify(response));
+    return response.code === 0;
   }
 );
 
@@ -92,6 +135,19 @@ export const accountsSlice = createSlice({
         state.status = "idle";
         const account = action.payload;
         state.accountList[account.address] = account;
+      })
+      .addCase(sendCoins.pending, (state) => {
+        state.messages.push("sending coins...");
+      })
+      .addCase(sendCoins.fulfilled, (state, success) => {
+        if (success) {
+          state.messages.push("coins sent");
+        } else {
+          state.messages.push("failed to send coins");
+        }
+      })
+      .addCase(sendCoins.rejected, (state) => {
+        state.messages.push("error sending coins");
       });
   },
 });

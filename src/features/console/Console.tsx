@@ -26,7 +26,6 @@ const highlightColors = {
 export const Console: FC = () => {
   const contract = useAppSelector(selectedContract);
   const account = useAppSelector(selectedAccount);
-  const { keplr } = useKeplr();
 
   const [message, setMessage] = useState("");
   const [result, setResult] = useState("Response will appear here");
@@ -68,7 +67,7 @@ export const Console: FC = () => {
       if (!account) throw new Error("No account selected");
       if (!contract) throw new Error("No contract selected");
 
-      const connection = await getClient(account, keplr);
+      const connection = await getClient(account);
       if (connection.clientType !== ClientType.Signing)
         throw new Error("Failed to get signing client");
 

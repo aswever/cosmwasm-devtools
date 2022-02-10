@@ -1,0 +1,12 @@
+.dialog {
+  z-index: 100;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 12rem;
+  margin-top: -1rem;
+  margin-bottom: 0.5rem;
+}
