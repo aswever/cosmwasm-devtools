@@ -6,7 +6,6 @@ import {
 } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import counterReducer from "../features/counter/counterSlice";
 import accountsReducer from "../features/accounts/accountsSlice";
 import contractsReducer from "../features/contracts/contractsSlice";
 
@@ -18,7 +17,6 @@ const persistConfig = {
 const reducer = persistReducer(
   persistConfig,
   combineReducers({
-    counter: counterReducer,
     accounts: accountsReducer,
     contracts: contractsReducer,
   })
