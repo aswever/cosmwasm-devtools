@@ -4,10 +4,10 @@
     "chainId": "juno-1",
     "rpcEndpoint": "https://rpc-juno.itastakers.com/",
     "restEndpoint": "https://lcd-juno.itastakers.com/",
+    "faucetEndpoint": "",
     "addressPrefix": "juno",
-    "coinName": "juno",
+    "microDenom": "ujuno",
     "coinDecimals": "6",
-    "coinGeckoId": "juno-network",
     "gasPrice": "0.025"
   },
   "juno-local-test": {
@@ -15,10 +15,10 @@
     "chainId": "testing",
     "rpcEndpoint": "https://localhost:26657",
     "restEndpoint": "https://localhost:1317",
+    "faucetEndpoint": "https://localhost:8000",
     "addressPrefix": "juno",
-    "coinName": "junox",
+    "microDenom": "ujunox",
     "coinDecimals": "6",
-    "coinGeckoId": "",
     "gasPrice": "0.025"
   },
   "juno-uni": {
@@ -26,21 +26,21 @@
     "chainId": "Uni1",
     "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
     "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
+    "faucetEndpoint": "https://faucet.uni.juno.deuslabs.fi",
     "addressPrefix": "juno",
-    "coinName": "junox",
+    "microDenom": "ujunox",
     "coinDecimals": "6",
-    "coinGeckoId": "",
     "defaultGas": "0.025"
   },
   "pebblenet": {
     "chainName": "Pebblenet",
     "chainId": "pebblenet-1",
-    "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
-    "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
+    "rpcEndpoint": "https://rpc.pebblenet.cosmwasm.com",
+    "restEndpoint": "https://lcd.pebblenet.cosmwasm.com",
+    "faucetEndpoint": "https://faucet.pebblenet.cosmwasm.com",
     "addressPrefix": "wasm",
-    "coinName": "pebble",
+    "microDenom": "upebble",
     "coinDecimals": "6",
-    "coinGeckoId": "",
     "defaultGas": "0.025"
   }
 }

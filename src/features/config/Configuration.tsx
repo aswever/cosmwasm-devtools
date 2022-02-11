@@ -28,17 +28,17 @@ const config = {
   restEndpoint: {
     label: "REST endpoint",
   },
+  faucetEndpoint: {
+    label: "Faucet endpoint",
+  },
   addressPrefix: {
     label: "Address prefix",
   },
-  coinName: {
-    label: "Coin name",
+  microDenom: {
+    label: "Micro denom",
   },
   coinDecimals: {
     label: "Coin decimals",
-  },
-  coinGeckoId: {
-    label: "Coin gecko ID",
   },
   gasPrice: {
     label: "Gas price",
@@ -122,7 +122,7 @@ export const Configuration: FC = () => {
           onClick={() => save()}
           variant="neutral"
         >
-          Save
+          Save & Connect
         </SlButton>
       </div>
     </SlDialog>

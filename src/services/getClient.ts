@@ -2,6 +2,7 @@ import {
   CosmWasmClient,
   SigningCosmWasmClient,
 } from "@cosmjs/cosmwasm-stargate";
+import { FaucetClient } from "@cosmjs/faucet-client";
 import { DirectSecp256k1HdWallet, OfflineSigner } from "@cosmjs/proto-signing";
 import { GasPrice } from "@cosmjs/stargate";
 import { Keplr } from "@keplr-wallet/types";
@@ -35,6 +36,7 @@ export type ClientConnection =
 
 let connection: ClientConnection;
 let savedKeplr: Keplr;
+let savedFaucet: FaucetClient;
 
 export async function getKeplr(): Promise<Keplr> {
   let keplr: Keplr | undefined;
@@ -63,6 +65,14 @@ export async function getKeplr(): Promise<Keplr> {
   if (!keplr) throw new Error("Keplr not found");
   savedKeplr = keplr;
   return keplr;
+}
+
+export async function getFaucet(): Promise<FaucetClient> {
+  if (!savedFaucet) {
+    savedFaucet = new FaucetClient(configService.get("faucetEndpoint"));
+  }
+
+  return savedFaucet;
 }
 
 export async function getClient(account?: Account): Promise<ClientConnection> {

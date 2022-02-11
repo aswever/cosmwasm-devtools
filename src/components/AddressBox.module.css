@@ -47,13 +47,18 @@
 }
 
 .addressBox.selected::part(:global(body)):hover {
-  background-color: #333;
+  background-color: black;
+  cursor: default;
 }
 
 .addressBox .left {
   display: flex;
   flex-grow: 1;
   overflow: hidden;
+}
+
+.addressBox sl-icon {
+  cursor: pointer;
 }
 
 .close {

@@ -1,10 +1,11 @@
 const defaultConfig: Record<string, unknown> = {
   rpcEndpoint: "http://localhost:26657",
   restEndpoint: "http://localhost:1317",
+  faucetEndpoint: "http://localhost:8000",
   addressPrefix: "juno",
   defaultGas: "1",
-  defaultDenom: "ujunox",
   coinName: "junox",
+  defaultDenom: "ujunox",
   coinDecimals: "6",
   coinGeckoId: "juno-network",
   chainId: "testing",
