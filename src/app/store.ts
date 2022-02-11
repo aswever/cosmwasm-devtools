@@ -8,6 +8,7 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import accountsReducer from "../features/accounts/accountsSlice";
 import contractsReducer from "../features/contracts/contractsSlice";
+import configReducer from "../features/config/configSlice";
 
 const persistConfig = {
   key: "root",
@@ -19,6 +20,7 @@ const reducer = persistReducer(
   combineReducers({
     accounts: accountsReducer,
     contracts: contractsReducer,
+    config: configReducer,
   })
 );
 

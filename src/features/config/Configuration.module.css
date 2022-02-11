@@ -1,0 +1,42 @@
+.dialog {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.dialog::part(:global(panel)) {
+  width: 50rem;
+}
+
+.header {
+  display: flex;
+}
+
+.title {
+  padding-top: 0.25rem;
+}
+
+.loadPreset {
+  display: inline-block;
+  margin-left: 2.5rem;
+  flex-grow: 1;
+}
+
+.form {
+  margin-top: -1rem;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 25rem;
+  margin-bottom: 1rem;
+}
+
+.form sl-input,
+.form sl-button {
+  margin: 0.5em 0;
+  align-self: center;
+  width: 45%;
+}
+
+.form sl-button {
+  margin-top: 1.75em;
+}

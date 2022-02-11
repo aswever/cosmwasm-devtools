@@ -1,5 +1,4 @@
-import { Keplr } from "@keplr-wallet/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { configService } from "../services/Config";
 import { useAppDispatch } from "../app/hooks";
 import {
@@ -9,11 +8,6 @@ import {
 import { getKeplr } from "../services/getClient";
 
 const CosmosCoinType = 118;
-const GasPrices = {
-  low: 0.01,
-  average: 0.025,
-  high: 0.03,
-};
 
 export function useKeplr(): {
   connect: () => Promise<void>;
@@ -40,6 +34,7 @@ export function useKeplr(): {
     const chainName: string = configService.get("chainName");
     const rpcEndpoint: string = configService.get("rpcEndpoint");
     const restEndpoint: string = configService.get("restEndpoint");
+    const gasPrice = Number.parseFloat(configService.get("gasPrice"));
     const coinDenom = coin.toUpperCase();
     const coinMinimalDenom = `u${coin}`;
 
@@ -82,7 +77,11 @@ export function useKeplr(): {
         coinGeckoId,
       },
       coinType: CosmosCoinType,
-      gasPriceStep: GasPrices,
+      gasPriceStep: {
+        low: gasPrice / 2,
+        average: gasPrice,
+        high: gasPrice * 2,
+      },
     });
   }, []);
 

@@ -1,0 +1,38 @@
+.adder {
+  width: 90%;
+  margin: 0.2rem 0.5rem;
+  cursor: pointer;
+  margin-top: auto;
+  margin-bottom: 1em;
+}
+
+.adder::part(:global(body)):hover {
+  background-color: #f5f5f5;
+}
+
+.adder::part(:global(body)) {
+  padding: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.chainName {
+  font-weight: bold;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.settings {
+  flex-shrink: 0;
+  margin-top: 0.1em;
+}
+
+.connection {
+  margin-top: 0.1em;
+  margin-right: 0.5em;
+}
+
+.settings::part(:global(base)):hover {
+  color: darksalmon;
+}

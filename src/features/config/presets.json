@@ -1,0 +1,46 @@
+{
+  "juno-mainnet": {
+    "chainName": "Juno Mainnet",
+    "chainId": "juno-1",
+    "rpcEndpoint": "https://rpc-juno.itastakers.com/",
+    "restEndpoint": "https://lcd-juno.itastakers.com/",
+    "addressPrefix": "juno",
+    "coinName": "juno",
+    "coinDecimals": "6",
+    "coinGeckoId": "juno-network",
+    "gasPrice": "0.025"
+  },
+  "juno-local-test": {
+    "chainName": "Juno Local Test",
+    "chainId": "testing",
+    "rpcEndpoint": "https://localhost:26657",
+    "restEndpoint": "https://localhost:1317",
+    "addressPrefix": "juno",
+    "coinName": "junox",
+    "coinDecimals": "6",
+    "coinGeckoId": "",
+    "gasPrice": "0.025"
+  },
+  "juno-uni": {
+    "chainName": "Uni",
+    "chainId": "Uni1",
+    "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
+    "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
+    "addressPrefix": "juno",
+    "coinName": "junox",
+    "coinDecimals": "6",
+    "coinGeckoId": "",
+    "defaultGas": "0.025"
+  },
+  "pebblenet": {
+    "chainName": "Pebblenet",
+    "chainId": "pebblenet-1",
+    "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
+    "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
+    "addressPrefix": "wasm",
+    "coinName": "pebble",
+    "coinDecimals": "6",
+    "coinGeckoId": "",
+    "defaultGas": "0.025"
+  }
+}

@@ -26,6 +26,8 @@ pre {
   left: 0;
   overflow-x: hidden;
   border-right: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
 }
 
 .console {
