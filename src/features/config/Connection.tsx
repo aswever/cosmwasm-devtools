@@ -1,13 +1,13 @@
 import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
 import React, { FC } from "react";
 import styles from "./Connection.module.css";
-import { configService } from "../../services/Config";
-import { useAppDispatch } from "../../app/hooks";
-import { setConfigModalOpen } from "./configSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { configSelector, setConfigModalOpen } from "./configSlice";
 
 export const Connection: FC = () => {
   const dispatch = useAppDispatch();
-  const chainName: string = configService.get("chainName");
+  const config = useAppSelector(configSelector);
+  const chainName: string = config("chainName");
 
   return (
     <SlCard className={styles.adder}>

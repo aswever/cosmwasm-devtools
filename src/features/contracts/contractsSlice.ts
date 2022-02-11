@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { getQuerier } from "../../services/Querier";
+import { getClient } from "../../services/getClient";
 import { AccountType, Contract } from "../accounts/accountsSlice";
+import { configSelector } from "../config/configSlice";
 
 export interface ContractsState {
   contractList: { [key: string]: Contract };
@@ -16,8 +17,11 @@ const initialState: ContractsState = {
 
 export const addContract = createAsyncThunk(
   "contracts/add",
-  async (address: string): Promise<Contract> => {
-    const querier = await getQuerier();
+  async (address: string, { getState }): Promise<Contract> => {
+    const querier = await getClient(
+      null,
+      configSelector(getState() as RootState)
+    );
     const contract = await querier.client.getContract(address);
 
     /* broken method?

@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { RootState } from "../../app/store";
-import { configService } from "../../services/Config";
 import { Contract as CosmWasmContract } from "@cosmjs/cosmwasm-stargate";
 import { ClientType, getClient } from "../../services/getClient";
-import { toMicroCoin } from "../../util/coins";
+import { toMicroAmount } from "../../util/coins";
+import { configSelector } from "../config/configSlice";
 
 export enum AccountType {
   Basic,
@@ -50,15 +50,19 @@ const initialState: AccountsState = {
 
 export const importAccount = createAsyncThunk(
   "accounts/import",
-  async ({
-    label,
-    mnemonic,
-  }: {
-    label: string;
-    mnemonic: string;
-  }): Promise<BasicAccount> => {
+  async (
+    {
+      label,
+      mnemonic,
+    }: {
+      label: string;
+      mnemonic: string;
+    },
+    { getState }
+  ): Promise<BasicAccount> => {
+    const state = getState() as RootState;
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-      prefix: configService.get("addressPrefix"),
+      prefix: state.config.entries["addressPrefix"],
     });
     const [{ address }] = await wallet.getAccounts();
     return { label, mnemonic, address, type: AccountType.Basic };
@@ -83,13 +87,16 @@ export const sendCoins = createAsyncThunk(
   ): Promise<boolean> => {
     const state = getState() as RootState;
     const senderAccount = state.accounts.accountList[sender];
-    const connection = await getClient(senderAccount);
+    const connection = await getClient(senderAccount, configSelector(state));
     if (connection.clientType !== ClientType.Signing) {
       throw new Error("Client is not a signing client");
     }
 
     const coinsAmount = [
-      toMicroCoin({ amount, denom: configService.get("coinName") }),
+      {
+        amount: toMicroAmount(amount, state.config.entries["coinDecimals"]),
+        denom: state.config.entries["microDenom"],
+      },
     ];
 
     const response = await connection.client.sendTokens(

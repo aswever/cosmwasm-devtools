@@ -2,6 +2,7 @@ import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
 import React, { FC, useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "../app/hooks";
 import { Account, AccountType } from "../features/accounts/accountsSlice";
+import { configSelector } from "../features/config/configSlice";
 import { getClient, getFaucet } from "../services/getClient";
 import { fromMicroCoin, fromMicroDenom } from "../util/coins";
 import styles from "./AddressBox.module.css";
@@ -28,7 +29,7 @@ export const AddressBox: FC<AddressBoxProps> = ({
 }) => {
   const [balance, setBalance] = useState("");
   const [sendCoinsOpen, setSendCoinsOpen] = useState(false);
-  const config = useAppSelector((state) => state.config.entries);
+  const config = useAppSelector(configSelector);
 
   const classes = [styles.addressBox];
   if (selected) {
@@ -36,24 +37,26 @@ export const AddressBox: FC<AddressBoxProps> = ({
   }
 
   useEffect(() => {
+    getBalance();
     const interval = setInterval(() => getBalance(), CHECK_BALANCE_INTERVAL);
     return () => clearInterval(interval);
   });
 
   const getBalance = useCallback(async () => {
-    const denom: string = config["microDenom"];
+    const denom: string = config("microDenom");
     if (!account) return setBalance(`0${fromMicroDenom(denom)}`);
-    const { client } = await getClient(account);
+    const { client } = await getClient(account, config);
     const balance = fromMicroCoin(
-      await client.getBalance(account.address, denom)
+      await client.getBalance(account.address, denom),
+      config("coinDecimals")
     );
     setBalance(`${balance.amount}${balance.denom}`);
   }, [account, config]);
 
   const getCoins = useCallback(async () => {
     if (!account) throw new Error("no account selected");
-    const faucet = await getFaucet();
-    faucet.credit(account.address, config["microDenom"]);
+    const faucet = await getFaucet(config("faucetEndpoint"));
+    faucet.credit(account.address, config("microDenom"));
   }, [account, config]);
 
   return (
@@ -66,7 +69,7 @@ export const AddressBox: FC<AddressBoxProps> = ({
           </div>
           {account?.type !== AccountType.Contract && selected && (
             <>
-              {config["faucetEndpoint"] && (
+              {config("faucetEndpoint") && (
                 <SlIcon
                   name="coin"
                   className={styles.close}

@@ -1,7 +1,6 @@
 import {
   SlButton,
   SlDialog,
-  SlDivider,
   SlInput,
   SlMenuItem,
   SlSelect,
@@ -101,7 +100,9 @@ export const Configuration: FC = () => {
             }
           >
             {Object.entries(presets).map(([id, { chainName }]) => (
-              <SlMenuItem value={id}>{chainName}</SlMenuItem>
+              <SlMenuItem key={id} value={id}>
+                {chainName}
+              </SlMenuItem>
             ))}
           </SlSelect>
         </div>
@@ -109,6 +110,7 @@ export const Configuration: FC = () => {
       <div className={styles.form}>
         {Object.entries(config).map(([key, { label }]) => (
           <SlInput
+            key={key}
             label={label}
             value={localEntries[key] ?? ""}
             className={styles.label}

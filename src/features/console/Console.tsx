@@ -6,13 +6,12 @@ import {
 import React, { FC, useState } from "react";
 import Editor from "react-simple-code-editor";
 import formatHighlight from "json-format-highlight";
-import { getQuerier } from "../../services/Querier";
 import { useAppSelector } from "../../app/hooks";
 import { selectedContract } from "../contracts/contractsSlice";
 import styles from "./Console.module.css";
 import { getClient, ClientType } from "../../services/getClient";
 import { selectedAccount } from "../accounts/accountsSlice";
-import { useKeplr } from "../../hooks/useKeplr";
+import { configSelector } from "../config/configSlice";
 
 const highlightColors = {
   keyColor: "black",
@@ -26,6 +25,7 @@ const highlightColors = {
 export const Console: FC = () => {
   const contract = useAppSelector(selectedContract);
   const account = useAppSelector(selectedAccount);
+  const config = useAppSelector(configSelector);
 
   const [message, setMessage] = useState("");
   const [result, setResult] = useState("Response will appear here");
@@ -57,7 +57,7 @@ export const Console: FC = () => {
   const query = async () => {
     run(async (queryObj) => {
       if (!contract) throw new Error("No contract selected");
-      const querier = await getQuerier();
+      const querier = await getClient(null, config);
       return querier.client.queryContractSmart(contract.address, queryObj);
     });
   };
@@ -67,7 +67,7 @@ export const Console: FC = () => {
       if (!account) throw new Error("No account selected");
       if (!contract) throw new Error("No contract selected");
 
-      const connection = await getClient(account);
+      const connection = await getClient(account, config);
       if (connection.clientType !== ClientType.Signing)
         throw new Error("Failed to get signing client");
 

@@ -13,9 +13,9 @@
   "juno-local-test": {
     "chainName": "Juno Local Test",
     "chainId": "testing",
-    "rpcEndpoint": "https://localhost:26657",
-    "restEndpoint": "https://localhost:1317",
-    "faucetEndpoint": "https://localhost:8000",
+    "rpcEndpoint": "http://localhost:26657",
+    "restEndpoint": "http://localhost:1317",
+    "faucetEndpoint": "http://localhost:8000",
     "addressPrefix": "juno",
     "microDenom": "ujunox",
     "coinDecimals": "6",
@@ -30,7 +30,7 @@
     "addressPrefix": "juno",
     "microDenom": "ujunox",
     "coinDecimals": "6",
-    "defaultGas": "0.025"
+    "gasPrice": "0.025"
   },
   "pebblenet": {
     "chainName": "Pebblenet",
@@ -41,6 +41,6 @@
     "addressPrefix": "wasm",
     "microDenom": "upebble",
     "coinDecimals": "6",
-    "defaultGas": "0.025"
+    "gasPrice": "0.025"
   }
 }

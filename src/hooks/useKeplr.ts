@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { configService } from "../services/Config";
-import { useAppDispatch } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   AccountType,
   setKeplrAccount,
 } from "../features/accounts/accountsSlice";
+import { configSelector } from "../features/config/configSlice";
 import { getKeplr } from "../services/getClient";
 
 const CosmosCoinType = 118;
@@ -12,29 +12,30 @@ const CosmosCoinType = 118;
 export function useKeplr(): {
   connect: () => Promise<void>;
 } {
+  const config = useAppSelector(configSelector);
   const dispatch = useAppDispatch();
 
   const getAccount = useCallback(async (): Promise<void> => {
     const keplr = await getKeplr();
 
     const { name: label, bech32Address: address } = await keplr.getKey(
-      configService.get("chainId")
+      config("chainId")
     );
 
     dispatch(setKeplrAccount({ label, address, type: AccountType.Keplr }));
-  }, [dispatch]);
+  }, [dispatch, config]);
 
   const suggestChain = useCallback(async (): Promise<void> => {
     const keplr = await getKeplr();
 
-    const coin: string = configService.get("coinName");
-    const coinDecimals = Number.parseInt(configService.get("coinDecimals"));
-    const coinGeckoId: string = configService.get("coinGeckoId");
-    const chainId: string = configService.get("chainId");
-    const chainName: string = configService.get("chainName");
-    const rpcEndpoint: string = configService.get("rpcEndpoint");
-    const restEndpoint: string = configService.get("restEndpoint");
-    const gasPrice = Number.parseFloat(configService.get("gasPrice"));
+    const coin: string = config("coinName");
+    const coinDecimals = Number.parseInt(config("coinDecimals"));
+    const coinGeckoId: string = config("coinGeckoId");
+    const chainId: string = config("chainId");
+    const chainName: string = config("chainName");
+    const rpcEndpoint: string = config("rpcEndpoint");
+    const restEndpoint: string = config("restEndpoint");
+    const gasPrice = Number.parseFloat(config("gasPrice"));
     const coinDenom = coin.toUpperCase();
     const coinMinimalDenom = `u${coin}`;
 
@@ -59,7 +60,6 @@ export function useKeplr(): {
           coinDenom,
           coinMinimalDenom,
           coinDecimals,
-          coinGeckoId,
         },
       ],
       feeCurrencies: [
@@ -83,7 +83,7 @@ export function useKeplr(): {
         high: gasPrice * 2,
       },
     });
-  }, []);
+  }, [config]);
 
   const connect = useCallback(async (): Promise<void> => {
     await getAccount();

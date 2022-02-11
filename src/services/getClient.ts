@@ -7,7 +7,6 @@ import { DirectSecp256k1HdWallet, OfflineSigner } from "@cosmjs/proto-signing";
 import { GasPrice } from "@cosmjs/stargate";
 import { Keplr } from "@keplr-wallet/types";
 import { Account, AccountType } from "../features/accounts/accountsSlice";
-import { configService } from "./Config";
 
 export enum ClientType {
   Querying,
@@ -67,34 +66,37 @@ export async function getKeplr(): Promise<Keplr> {
   return keplr;
 }
 
-export async function getFaucet(): Promise<FaucetClient> {
+export async function getFaucet(endpoint: string): Promise<FaucetClient> {
   if (!savedFaucet) {
-    savedFaucet = new FaucetClient(configService.get("faucetEndpoint"));
+    savedFaucet = new FaucetClient(endpoint);
   }
 
   return savedFaucet;
 }
 
-export async function getClient(account?: Account): Promise<ClientConnection> {
+export async function getClient(
+  account: Account | null,
+  config: (key: string) => string
+): Promise<ClientConnection> {
   if (
     !connection ||
     (account &&
       connection.clientType === ClientType.Signing &&
       connection.address !== account.address)
   ) {
-    const rpcEndpoint: string = configService.get("rpcEndpoint");
+    const rpcEndpoint: string = config("rpcEndpoint");
 
     if (account && account.type !== AccountType.Contract) {
       let signer: OfflineSigner | null = null;
       const address = account.address;
       if (account.type === AccountType.Basic) {
-        const prefix: string = configService.get("addressPrefix");
+        const prefix: string = config("addressPrefix");
         signer = await DirectSecp256k1HdWallet.fromMnemonic(account.mnemonic, {
           prefix,
         });
       } else if (account.type === AccountType.Keplr) {
         const keplr = await getKeplr();
-        const chainId: string = configService.get("chainId");
+        const chainId: string = config("chainId");
         await keplr.enable(chainId);
         signer = keplr.getOfflineSigner(chainId);
       }
@@ -112,9 +114,7 @@ export async function getClient(account?: Account): Promise<ClientConnection> {
           signer,
           {
             gasPrice: GasPrice.fromString(
-              `${configService.get("defaultGas")}${configService.get(
-                "defaultDenom"
-              )}`
+              `${config("gasPrice")}${config("microDenom")}`
             ),
           }
         ),
