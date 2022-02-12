@@ -17,11 +17,13 @@ import {
   sendCoins,
   setSendCoinsOpen,
 } from "../features/accounts/accountsSlice";
+import { fromMicroDenom } from "../util/coins";
 
 export const SendCoins: FC = () => {
   const dispatch = useAppDispatch();
   const open = useAppSelector((state) => state.accounts.sendCoinsOpen);
   const sender = useAppSelector((state) => state.accounts.currentAccount!);
+  const config = useAppSelector((state) => state.config.entries);
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
@@ -78,7 +80,9 @@ export const SendCoins: FC = () => {
           onSlChange={(e) =>
             setAmount((e.target as SlInputElement).value.trim())
           }
-        />
+        >
+          <div slot="suffix">{fromMicroDenom(config["microDenom"])}</div>
+        </SlInput>
         <SlInput
           placeholder="Memo"
           value={memo}

@@ -43,7 +43,7 @@ export const checkConnection = createAsyncThunk<
       if (testing)
         dispatch(
           pushMessage({
-            level: "success",
+            status: "success",
             message: `Successfully connected to ${config["chainName"]}`,
           })
         );
@@ -52,7 +52,7 @@ export const checkConnection = createAsyncThunk<
       dispatch(setConnectionState(ConnectionState.Error));
       if (testing)
         dispatch(
-          pushMessage({ level: "danger", message: "Connection failed" })
+          pushMessage({ status: "danger", message: "Connection failed" })
         );
     }
   }

@@ -115,7 +115,7 @@ export const hitFaucet = createAsyncThunk(
     const faucet = await getFaucet(config["faucetEndpoint"]);
     dispatch(
       pushMessage({
-        level: "neutral",
+        status: "neutral",
         message: "Requesting faucet funds...",
       })
     );
@@ -123,7 +123,7 @@ export const hitFaucet = createAsyncThunk(
       await faucet.credit(address, config["microDenom"]);
       dispatch(
         pushMessage({
-          level: "success",
+          status: "success",
           message: "Successfully requested funds from faucet",
         })
       );
@@ -132,7 +132,7 @@ export const hitFaucet = createAsyncThunk(
       console.error(e);
       dispatch(
         pushMessage({
-          level: "danger",
+          status: "danger",
           header: "Error requesting funds from faucet",
           message: e instanceof Error ? e.message : JSON.stringify(e),
         })
@@ -184,7 +184,7 @@ export const sendCoins = createAsyncThunk(
 
       dispatch(
         pushMessage({
-          level: "success",
+          status: "success",
           message: "Coins sent successfully",
         })
       );
@@ -192,7 +192,7 @@ export const sendCoins = createAsyncThunk(
       console.error(e);
       dispatch(
         pushMessage({
-          level: "danger",
+          status: "danger",
           header: "Error sending coins",
           message: e instanceof Error ? e.message : JSON.stringify(e),
         })

@@ -9,6 +9,7 @@ import storage from "redux-persist/lib/storage";
 import accountsReducer from "../features/accounts/accountsSlice";
 import configReducer from "../features/config/configSlice";
 import messagesReducer from "../features/messages/messagesSlice";
+import consoleReducer from "../features/console/consoleSlice";
 
 const persistConfig = {
   key: "root",
@@ -21,6 +22,7 @@ const reducer = persistReducer(
     accounts: accountsReducer,
     config: configReducer,
     messages: messagesReducer,
+    console: consoleReducer,
   })
 );
 

@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef } from "react";
 import { SlAlert, SlIcon } from "@shoelace-style/shoelace/dist/react";
 import type SlAlertElement from "@shoelace-style/shoelace/dist/components/alert/alert";
-import { Message, shiftMessage } from "./messagesSlice";
+import { Message, messageIconMap, shiftMessage } from "./messagesSlice";
 import { useAppDispatch } from "../../app/hooks";
 
 interface ToastProps {
@@ -21,8 +21,8 @@ export const Toast: FC<ToastProps> = ({ msg }) => {
 
   return (
     <div>
-      <SlAlert ref={msgRef} variant={msg.level} duration={3000} closable>
-        <SlIcon slot="icon" name="check2-circle" />
+      <SlAlert ref={msgRef} variant={msg.status} duration={3000} closable>
+        <SlIcon slot="icon" name={messageIconMap[msg.status]} />
         {msg.header && (
           <>
             <strong>{msg.header}</strong>

@@ -1,0 +1,23 @@
+.dialog {
+  z-index: 100;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 10rem;
+  margin-top: -1rem;
+  margin-bottom: 0.5rem;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.buttons sl-button,
+.buttons sl-switch {
+  flex-grow: 1;
+}
