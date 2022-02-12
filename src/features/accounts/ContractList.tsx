@@ -1,6 +1,10 @@
 import React, { FC } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { deleteContract, selectContract } from "./contractsSlice";
+import {
+  contractAccounts,
+  deleteAccount,
+  selectContract,
+} from "./accountsSlice";
 import styles from "./ContractList.module.css";
 import { AddContract } from "./AddContract";
 import { AddressBox } from "../../components/AddressBox";
@@ -13,7 +17,7 @@ interface ContractProps {
 export const ContractDetails: FC<ContractProps> = ({ contract }) => {
   const dispatch = useAppDispatch();
   const selected = useAppSelector(
-    (state) => state.contracts.currentContract === contract.address
+    (state) => state.accounts.currentContract === contract.address
   );
 
   return (
@@ -22,13 +26,13 @@ export const ContractDetails: FC<ContractProps> = ({ contract }) => {
       account={contract}
       selected={selected}
       onClick={() => dispatch(selectContract(contract.address))}
-      onClickX={() => dispatch(deleteContract(contract.address))}
+      onClickX={() => dispatch(deleteAccount(contract.address))}
     />
   );
 };
 
 export const ContractList: FC = () => {
-  const contracts = useAppSelector((state) => state.contracts.contractList);
+  const contracts = useAppSelector(contractAccounts);
   return (
     <div className={styles.section}>
       <div className={styles.header}>Contracts</div>

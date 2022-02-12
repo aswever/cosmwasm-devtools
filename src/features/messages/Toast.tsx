@@ -15,7 +15,7 @@ export const Toast: FC<ToastProps> = ({ msg }) => {
   useEffect(() => {
     if (msgRef.current) {
       msgRef.current.toast();
-      setTimeout(() => dispatch(shiftMessage()), 3000);
+      dispatch(shiftMessage());
     }
   }, [msg, dispatch]);
 

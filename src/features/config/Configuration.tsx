@@ -7,7 +7,7 @@ import {
 } from "@shoelace-style/shoelace/dist/react";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input";
 import type SlSelectElement from "@shoelace-style/shoelace/dist/components/select/select";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import styles from "./Configuration.module.css";
 import {

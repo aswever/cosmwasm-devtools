@@ -1,11 +1,15 @@
 import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
-import React, { FC, useCallback, useEffect, useState } from "react";
-import { useAppSelector } from "../app/hooks";
-import { Account, AccountType } from "../features/accounts/accountsSlice";
-import { getClient, getFaucet } from "../services/getClient";
-import { fromMicroCoin, fromMicroDenom } from "../util/coins";
+import React, { FC, useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import {
+  Account,
+  AccountType,
+  balanceString,
+  checkBalance,
+  hitFaucet,
+  setSendCoinsOpen,
+} from "../features/accounts/accountsSlice";
 import styles from "./AddressBox.module.css";
-import { SendCoins } from "./SendCoins";
 
 interface AddressBoxProps {
   icon?: JSX.Element;
@@ -26,9 +30,9 @@ export const AddressBox: FC<AddressBoxProps> = ({
   onClick,
   onClickX,
 }) => {
-  const [balance, setBalance] = useState("");
-  const [sendCoinsOpen, setSendCoinsOpen] = useState(false);
+  const dispatch = useAppDispatch();
   const config = useAppSelector((state) => state.config.entries);
+  const balance = useAppSelector(balanceString(account?.address));
 
   const classes = [styles.addressBox];
   if (selected) {
@@ -36,27 +40,15 @@ export const AddressBox: FC<AddressBoxProps> = ({
   }
 
   useEffect(() => {
-    getBalance();
-    const interval = setInterval(() => getBalance(), CHECK_BALANCE_INTERVAL);
-    return () => clearInterval(interval);
-  });
-
-  const getBalance = useCallback(async () => {
-    const denom: string = config["microDenom"];
-    if (!account) return setBalance(`0${fromMicroDenom(denom)}`);
-    const { client } = await getClient(account, config);
-    const balance = fromMicroCoin(
-      await client.getBalance(account.address, denom),
-      config["coinDecimals"]
-    );
-    setBalance(`${balance.amount}${balance.denom}`);
-  }, [account, config]);
-
-  const getCoins = useCallback(async () => {
-    if (!account) throw new Error("no account selected");
-    const faucet = await getFaucet(config["faucetEndpoint"]);
-    faucet.credit(account.address, config["microDenom"]);
-  }, [account, config]);
+    if (account?.address) {
+      dispatch(checkBalance(account.address));
+      const interval = setInterval(
+        () => dispatch(checkBalance(account.address)),
+        CHECK_BALANCE_INTERVAL
+      );
+      return () => clearInterval(interval);
+    }
+  }, [account?.address, dispatch]);
 
   return (
     <>
@@ -66,19 +58,19 @@ export const AddressBox: FC<AddressBoxProps> = ({
             {icon}
             <div className={styles.label}>{label}</div>
           </div>
-          {account?.type !== AccountType.Contract && selected && (
+          {account && account.type !== AccountType.Contract && selected && (
             <>
               {config["faucetEndpoint"] && (
                 <SlIcon
                   name="coin"
                   className={styles.close}
-                  onClick={() => getCoins()}
+                  onClick={() => dispatch(hitFaucet(account.address))}
                 />
               )}
               <SlIcon
                 name="send"
                 className={styles.close}
-                onClick={() => setSendCoinsOpen(true)}
+                onClick={() => dispatch(setSendCoinsOpen(true))}
               />
             </>
           )}
@@ -93,7 +85,6 @@ export const AddressBox: FC<AddressBoxProps> = ({
           </div>
         )}
       </SlCard>
-      <SendCoins open={sendCoinsOpen} setOpen={setSendCoinsOpen} />
     </>
   );
 };

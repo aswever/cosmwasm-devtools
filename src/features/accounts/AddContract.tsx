@@ -9,7 +9,7 @@ import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/
 import React, { FC, useState } from "react";
 import { useAppDispatch } from "../../app/hooks";
 import styles from "./AddContract.module.css";
-import { addContract } from "./contractsSlice";
+import { importContract } from "./accountsSlice";
 
 interface ImportContractProps {
   open: boolean;
@@ -21,7 +21,7 @@ export const ImportContract: FC<ImportContractProps> = ({ open, setOpen }) => {
   const [address, setAddress] = useState("");
 
   function doImport() {
-    dispatch(addContract(address));
+    dispatch(importContract(address));
     setAddress("");
     setOpen(false);
   }

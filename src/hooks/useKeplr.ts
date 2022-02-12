@@ -1,3 +1,4 @@
+import { coin } from "@cosmjs/proto-signing";
 import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
@@ -21,7 +22,14 @@ export function useKeplr(): {
       config["chainId"]
     );
 
-    dispatch(setKeplrAccount({ label, address, type: AccountType.Keplr }));
+    dispatch(
+      setKeplrAccount({
+        label,
+        address,
+        type: AccountType.Keplr,
+        balance: coin(0, config["microDenom"]),
+      })
+    );
   }, [dispatch, config]);
 
   const suggestChain = useCallback(async (): Promise<void> => {

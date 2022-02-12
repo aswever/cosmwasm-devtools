@@ -83,11 +83,11 @@ export async function getClient(
     forceRefresh ||
     !connection ||
     (account &&
-      connection.clientType === ClientType.Signing &&
-      connection.address !== account.address)
+      (connection.clientType !== ClientType.Signing ||
+        (connection.clientType === ClientType.Signing &&
+          connection.address !== account.address)))
   ) {
     const rpcEndpoint: string = config["rpcEndpoint"];
-
     if (account && account.type !== AccountType.Contract) {
       let signer: OfflineSigner | null = null;
       const address = account.address;

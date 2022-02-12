@@ -16,7 +16,7 @@ export function toMicroCoin(coin: Coin, coinDecimals: string): Coin {
 
 export function toMicroAmount(amount: string, coinDecimals: string) {
   return String(
-    Number.parseInt(amount) * Math.pow(10, Number.parseInt(coinDecimals))
+    Number.parseFloat(amount) * Math.pow(10, Number.parseInt(coinDecimals))
   );
 }
 

@@ -12,39 +12,36 @@ import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/
 import React, { FC, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import styles from "./SendCoins.module.css";
-import { sendCoins } from "../features/accounts/accountsSlice";
+import {
+  contractAccounts,
+  sendCoins,
+  setSendCoinsOpen,
+} from "../features/accounts/accountsSlice";
 
-interface SendCoinsProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}
-
-export const SendCoins: FC<SendCoinsProps> = ({ open, setOpen }) => {
+export const SendCoins: FC = () => {
   const dispatch = useAppDispatch();
+  const open = useAppSelector((state) => state.accounts.sendCoinsOpen);
   const sender = useAppSelector((state) => state.accounts.currentAccount!);
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
-
   const accounts = useAppSelector((state) =>
     Object.values(state.accounts.accountList).filter(
       (account) => account.address !== sender
     )
   );
-  const contracts = useAppSelector((state) =>
-    Object.values(state.contracts.contractList)
-  );
+  const contracts = useAppSelector(contractAccounts);
 
   function dispatchSend() {
     dispatch(sendCoins({ sender, recipient, amount, memo }));
-    setOpen(false);
+    dispatch(setSendCoinsOpen(false));
   }
 
   return (
     <SlDialog
       label="Send coins"
       open={open}
-      onSlAfterHide={() => setOpen(false)}
+      onSlRequestClose={() => dispatch(setSendCoinsOpen(false))}
       className={styles.dialog}
     >
       <div className={styles.form}>

@@ -10,6 +10,7 @@ import styles from "./AccountList.module.css";
 import { AddAccount } from "./AddAccount";
 import { KeplrAccount } from "./KeplrAccount";
 import { AddressBox } from "../../components/AddressBox";
+import { SendCoins } from "../../components/SendCoins";
 
 interface AccountProps {
   account: Account;
@@ -42,6 +43,7 @@ export const AccountList: FC = () => {
         <AccountInfo key={account.address} account={account} />
       ))}
       <AddAccount />
+      <SendCoins />
     </div>
   );
 };

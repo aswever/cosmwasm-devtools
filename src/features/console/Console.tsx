@@ -7,7 +7,7 @@ import React, { FC, useState } from "react";
 import Editor from "react-simple-code-editor";
 import formatHighlight from "json-format-highlight";
 import { useAppSelector } from "../../app/hooks";
-import { selectedContract } from "../contracts/contractsSlice";
+import { selectedContract } from "../accounts/accountsSlice";
 import styles from "./Console.module.css";
 import { getClient, ClientType } from "../../services/getClient";
 import { selectedAccount } from "../accounts/accountsSlice";
