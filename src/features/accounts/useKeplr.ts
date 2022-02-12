@@ -76,7 +76,7 @@ export function useKeplr(): {
     const rpcEndpoint: string = config["rpcEndpoint"];
     const restEndpoint: string = config["restEndpoint"];
     const gasPrice = Number.parseFloat(config["gasPrice"]);
-    const coinDenom = coin.toUpperCase();
+    const coinDenom = coin?.toUpperCase();
     const coinMinimalDenom = `u${coin}`;
 
     await keplr.experimentalSuggestChain({

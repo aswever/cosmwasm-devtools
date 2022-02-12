@@ -1,5 +1,5 @@
 import { SlIcon } from "@shoelace-style/shoelace/dist/react";
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { AccountCard } from "../../components/AccountCard";
 import { selectAccount, setKeplrAccount } from "./accountsSlice";
@@ -14,9 +14,11 @@ export const KeplrAccount: FC = () => {
     (state) => state.accounts.currentAccount === account?.address
   );
 
+  const reconnect = useCallback(() => connect(), [connect]);
+
   return (
     <AccountCard
-      onClientChange={() => connect()}
+      onConfigChange={reconnect}
       icon={<SlIcon name="wallet2" className={styles.wallet} />}
       label={account?.label ?? "Connect wallet"}
       account={account}

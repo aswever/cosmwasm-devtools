@@ -54,6 +54,12 @@ sl-divider {
   flex-grow: 1;
 }
 
+.connection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .console {
   width: 80%;
   height: 100%;

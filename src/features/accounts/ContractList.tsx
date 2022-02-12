@@ -1,6 +1,7 @@
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
+  checkContract,
   contractAccounts,
   deleteAccount,
   selectContract,
@@ -20,13 +21,20 @@ export const ContractDetails: FC<ContractProps> = ({ contract }) => {
     (state) => state.accounts.currentContract === contract.address
   );
 
+  const check = useCallback(
+    () => dispatch(checkContract(contract)),
+    [dispatch, contract]
+  );
+
   return (
     <AccountCard
       label={contract.label || contract.address}
       account={contract}
       selected={selected}
+      disabled={!contract.exists}
       onClick={() => dispatch(selectContract(contract.address))}
       onClickX={() => dispatch(deleteAccount(contract.address))}
+      onConfigChange={check}
     />
   );
 };

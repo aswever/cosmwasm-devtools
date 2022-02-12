@@ -61,7 +61,7 @@ export const ExecuteOptions: FC = () => {
               setSaveDefaults((e.target as SlSwitchElement).checked)
             }
           >
-            Save as defaults
+            Save as default
           </SlSwitch>
           <SlButton variant="neutral" onClick={() => saveAndExecute()}>
             Execute

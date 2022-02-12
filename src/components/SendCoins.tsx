@@ -13,6 +13,7 @@ import React, { FC, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import styles from "./SendCoins.module.css";
 import {
+  AccountType,
   contractAccounts,
   sendCoins,
   setSendCoinsOpen,
@@ -29,7 +30,8 @@ export const SendCoins: FC = () => {
   const [memo, setMemo] = useState("");
   const accounts = useAppSelector((state) =>
     Object.values(state.accounts.accountList).filter(
-      (account) => account.address !== sender
+      (account) =>
+        account.address !== sender && account.type !== AccountType.Contract
     )
   );
   const contracts = useAppSelector(contractAccounts);
@@ -59,14 +61,14 @@ export const SendCoins: FC = () => {
             setRecipient((e.target as SlSelectElement).value as string)
           }
         >
-          <SlMenuLabel>Accounts</SlMenuLabel>
+          {accounts.length ? <SlMenuLabel>Accounts</SlMenuLabel> : null}
           {accounts.map((account) => (
             <SlMenuItem value={account.address} key={account.address}>
               {account.label || account.address}
             </SlMenuItem>
           ))}
-          <SlDivider />
-          <SlMenuLabel>Contracts</SlMenuLabel>
+          {accounts.length && contracts.length ? <SlDivider /> : null}
+          {contracts.length ? <SlMenuLabel>Contracts</SlMenuLabel> : null}
           {contracts.map((contract) => (
             <SlMenuItem value={contract.address} key={contract.address}>
               {contract.label || contract.address}

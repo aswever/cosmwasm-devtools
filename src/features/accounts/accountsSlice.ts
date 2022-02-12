@@ -32,6 +32,7 @@ export interface BasicAccount extends BaseAccount {
 export interface Contract extends BaseAccount {
   type: AccountType.Contract;
   contract: CosmWasmContract;
+  exists: boolean;
 }
 
 export type Account = KeplrAccount | BasicAccount | Contract;
@@ -59,41 +60,94 @@ export const importAccount = createAsyncThunk(
       label: string;
       mnemonic: string;
     },
-    { getState }
+    { getState, dispatch }
   ): Promise<BasicAccount> => {
     const state = getState() as RootState;
     const config = state.connection.config;
-    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-      prefix: config["addressPrefix"],
-    });
-    const [{ address }] = await wallet.getAccounts();
-    return {
-      label,
-      mnemonic,
-      address,
-      type: AccountType.Basic,
-      balance: coin(0, config["microDenom"]),
-    };
+    try {
+      const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+        prefix: config["addressPrefix"],
+      });
+      const [{ address }] = await wallet.getAccounts();
+      return {
+        label,
+        mnemonic,
+        address,
+        type: AccountType.Basic,
+        balance: coin(0, config["microDenom"]),
+      };
+    } catch (e) {
+      dispatch(
+        pushMessage({
+          status: "danger",
+          header: "Failed to add account",
+          message: e instanceof Error ? e.message : JSON.stringify(e),
+        })
+      );
+
+      throw e;
+    }
+  }
+);
+
+export const checkContract = createAsyncThunk(
+  "accounts/checkContract",
+  async (
+    account: Contract,
+    { getState }
+  ): Promise<Partial<Contract> | null> => {
+    const state = getState() as RootState;
+    const config = state.connection.config;
+    const client = await connectionManager.getQueryClient(config);
+    try {
+      const contract = await client.getContract(account.address);
+      const { label } = contract;
+
+      if (label !== account.label || !account.exists) {
+        return {
+          label,
+          exists: true,
+        };
+      }
+
+      return null;
+    } catch (e) {
+      return {
+        exists: false,
+      };
+    }
   }
 );
 
 export const importContract = createAsyncThunk(
   "accounts/importContract",
-  async (address: string, { getState }): Promise<Contract> => {
+  async (address: string, { getState, dispatch }): Promise<Contract> => {
     const state = getState() as RootState;
     const config = state.connection.config;
     const client = await connectionManager.getQueryClient(config);
-    const contract = await client.getContract(address);
+    try {
+      const contract = await client.getContract(address);
+      const { label } = contract;
 
-    const { label } = contract;
+      return {
+        type: AccountType.Contract,
+        address,
+        label,
+        contract,
+        balance: coin(0, config["microDenom"]),
+        exists: true,
+      };
+    } catch (e) {
+      dispatch(
+        pushMessage({
+          status: "danger",
+          header: "Failed to add contract",
+          message: e instanceof Error ? e.message : JSON.stringify(e),
+        })
+      );
 
-    return {
-      type: AccountType.Contract,
-      address,
-      label,
-      contract,
-      balance: coin(0, config["microDenom"]),
-    };
+      throw e;
+    }
   }
 );
 
@@ -268,6 +322,22 @@ export const accountsSlice = createSlice({
         state.accountList[account.address] = account;
         if (!state.currentContract) {
           state.currentContract = account.address;
+        }
+      })
+      .addCase(checkContract.fulfilled, (state, action) => {
+        const newAccountInfo = action.payload;
+        const account = action.meta.arg;
+        if (newAccountInfo && state.accountList[account.address]) {
+          state.accountList[account.address] = {
+            ...account,
+            ...newAccountInfo,
+          };
+          if (
+            !newAccountInfo.exists &&
+            state.currentContract === account.address
+          ) {
+            state.currentContract = undefined;
+          }
         }
       });
   },

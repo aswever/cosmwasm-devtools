@@ -16,9 +16,10 @@ interface AccountCardProps {
   label: string;
   account?: Account;
   selected: boolean;
+  disabled?: boolean;
   onClick: () => void;
   onClickX: () => void;
-  onClientChange?: () => void;
+  onConfigChange?: () => void;
 }
 
 export const CHECK_BALANCE_INTERVAL = 30000;
@@ -28,9 +29,10 @@ export const AccountCard: FC<AccountCardProps> = ({
   label,
   account,
   selected,
+  disabled,
   onClick,
   onClickX,
-  onClientChange,
+  onConfigChange,
 }) => {
   const dispatch = useAppDispatch();
   const config = useAppSelector((state) => state.connection.config);
@@ -40,7 +42,13 @@ export const AccountCard: FC<AccountCardProps> = ({
   const classes = [styles.accountCard];
   if (selected) {
     classes.push(styles.selected);
+  } else if (disabled) {
+    classes.push(styles.disabled);
   }
+
+  useEffect(() => {
+    if (onConfigChange) onConfigChange();
+  }, [config, onConfigChange]);
 
   useEffect(() => {
     if (account?.address) {
@@ -51,7 +59,7 @@ export const AccountCard: FC<AccountCardProps> = ({
       );
       return () => clearInterval(interval);
     }
-  }, [account?.address, dispatch]);
+  }, [account?.address, dispatch, config]);
 
   function copyAddress() {
     if (account?.address) navigator.clipboard.writeText(account.address);
@@ -61,7 +69,10 @@ export const AccountCard: FC<AccountCardProps> = ({
 
   return (
     <>
-      <SlCard className={classes.join(" ")} onClick={onClick}>
+      <SlCard
+        className={classes.join(" ")}
+        onClick={disabled ? undefined : onClick}
+      >
         <div className={styles.main}>
           <div className={styles.left}>
             {icon}

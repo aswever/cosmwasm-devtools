@@ -57,6 +57,15 @@
   cursor: default;
 }
 
+.accountCard.disabled::part(:global(base)) {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.accountCard.disabled .label {
+  font-weight: normal;
+}
+
 .accountCard .left {
   display: flex;
   flex-grow: 1;

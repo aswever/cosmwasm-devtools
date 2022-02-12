@@ -10,22 +10,22 @@
     "coinDecimals": "6",
     "gasPrice": "0.025"
   },
+  "juno-uni": {
+    "chainName": "Juno Testnet - Uni",
+    "chainId": "Uni1",
+    "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
+    "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
+    "addressPrefix": "juno",
+    "microDenom": "ujunox",
+    "coinDecimals": "6",
+    "gasPrice": "0.025"
+  },
   "juno-local-test": {
     "chainName": "Juno Local Test",
     "chainId": "testing",
     "rpcEndpoint": "http://localhost:26657",
     "restEndpoint": "http://localhost:1317",
     "faucetEndpoint": "http://localhost:8000",
-    "addressPrefix": "juno",
-    "microDenom": "ujunox",
-    "coinDecimals": "6",
-    "gasPrice": "0.025"
-  },
-  "juno-uni": {
-    "chainName": "Uni",
-    "chainId": "Uni1",
-    "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
-    "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
     "addressPrefix": "juno",
     "microDenom": "ujunox",
     "coinDecimals": "6",
