@@ -1,5 +1,5 @@
-import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
-import React, { FC, useEffect } from "react";
+import { SlCard, SlIcon, SlTooltip } from "@shoelace-style/shoelace/dist/react";
+import React, { FC, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   Account,
@@ -9,9 +9,9 @@ import {
   hitFaucet,
   setSendCoinsOpen,
 } from "../features/accounts/accountsSlice";
-import styles from "./AddressBox.module.css";
+import styles from "./AccountCard.module.css";
 
-interface AddressBoxProps {
+interface AccountCardProps {
   icon?: JSX.Element;
   label: string;
   account?: Account;
@@ -22,7 +22,7 @@ interface AddressBoxProps {
 
 export const CHECK_BALANCE_INTERVAL = 30000;
 
-export const AddressBox: FC<AddressBoxProps> = ({
+export const AccountCard: FC<AccountCardProps> = ({
   icon,
   label,
   account,
@@ -33,8 +33,9 @@ export const AddressBox: FC<AddressBoxProps> = ({
   const dispatch = useAppDispatch();
   const config = useAppSelector((state) => state.config.entries);
   const balance = useAppSelector(balanceString(account?.address));
+  const [copyTooltip, setCopyTooltip] = useState("Copy to clipboard");
 
-  const classes = [styles.addressBox];
+  const classes = [styles.accountCard];
   if (selected) {
     classes.push(styles.selected);
   }
@@ -50,6 +51,12 @@ export const AddressBox: FC<AddressBoxProps> = ({
     }
   }, [account?.address, dispatch]);
 
+  function copyAddress() {
+    if (account?.address) navigator.clipboard.writeText(account.address);
+    setCopyTooltip("Copied!");
+    setTimeout(() => setCopyTooltip("Copy to clipboard"), 2000);
+  }
+
   return (
     <>
       <SlCard className={classes.join(" ")} onClick={onClick}>
@@ -61,26 +68,44 @@ export const AddressBox: FC<AddressBoxProps> = ({
           {account && account.type !== AccountType.Contract && selected && (
             <>
               {config["faucetEndpoint"] && (
-                <SlIcon
-                  name="coin"
-                  className={styles.close}
-                  onClick={() => dispatch(hitFaucet(account.address))}
-                />
+                <SlTooltip content="Hit faucet">
+                  <SlIcon
+                    name="coin"
+                    className={styles.close}
+                    onClick={() => dispatch(hitFaucet(account.address))}
+                  />
+                </SlTooltip>
               )}
-              <SlIcon
-                name="send"
-                className={styles.close}
-                onClick={() => dispatch(setSendCoinsOpen(true))}
-              />
+              <SlTooltip content="Send coins">
+                <SlIcon
+                  name="send"
+                  className={styles.close}
+                  onClick={() => dispatch(setSendCoinsOpen(true))}
+                />
+              </SlTooltip>
             </>
           )}
           {account && (
-            <SlIcon name="x-lg" className={styles.close} onClick={onClickX} />
+            <SlTooltip
+              placement="top"
+              hoist={true}
+              content={
+                account.type === AccountType.Keplr
+                  ? "Disconnect wallet"
+                  : "Remove account"
+              }
+            >
+              <SlIcon name="x-lg" className={styles.close} onClick={onClickX} />
+            </SlTooltip>
           )}
         </div>
         {account && selected && (
           <div className={styles.details}>
-            <div className={styles.address}>{account.address}</div>
+            <SlTooltip content={copyTooltip} placement="bottom">
+              <div className={styles.address} onClick={() => copyAddress()}>
+                {account.address}
+              </div>
+            </SlTooltip>
             <div className={styles.balance}>{balance}</div>
           </div>
         )}

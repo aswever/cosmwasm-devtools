@@ -1,63 +1,69 @@
-.addressBox {
+.accountCard {
   width: 90%;
   margin: 0.2rem 0.5rem;
   cursor: pointer;
 }
 
-.addressBox::part(:global(body)):hover {
+.accountCard::part(:global(body)):hover {
   background-color: #f5f5f5;
 }
 
-.addressBox::part(:global(body)) {
+.accountCard::part(:global(body)) {
   padding: 0.5rem;
 }
 
-.addressBox .main,
-.addressBox .details {
+.accountCard .main,
+.accountCard .details {
   display: flex;
   justify-content: space-between;
 }
 
-.addressBox .details {
+.accountCard .details {
   margin-top: 0.5em;
   font-size: 0.8em;
 }
 
-.addressBox .details .balance {
+.accountCard .details .balance {
   margin-left: 1em;
   color: #88c;
 }
 
-.addressBox .label {
+.accountCard .label {
   font-weight: bold;
 }
 
-.addressBox .address {
+.accountCard .address {
   color: #bbb;
+  cursor: pointer;
 }
-.addressBox .label,
-.addressBox .address {
+
+.accountCard .address:hover {
+  color: #ddd;
+}
+
+.accountCard .label,
+.accountCard .address {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.addressBox.selected::part(:global(base)) {
+.accountCard.selected::part(:global(base)) {
   background-color: black;
   color: white;
 }
 
-.addressBox.selected::part(:global(body)):hover {
+.accountCard.selected::part(:global(body)):hover {
   background-color: black;
   cursor: default;
 }
 
-.addressBox .left {
+.accountCard .left {
   display: flex;
   flex-grow: 1;
   overflow: hidden;
 }
 
-.addressBox sl-icon {
+.accountCard sl-icon {
   cursor: pointer;
 }
 

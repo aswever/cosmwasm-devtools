@@ -12,10 +12,24 @@ pre {
   align-items: center;
 }
 
-.header {
+.header,
+.subhead {
   font-family: "Courier New", Courier, monospace;
   text-align: center;
   font-weight: normal;
+  margin-bottom: 0;
+}
+
+.subhead {
+  font-size: 0.9em;
+}
+
+.subhead a {
+  color: slateblue;
+  text-decoration: none;
+}
+
+sl-divider {
   margin-bottom: 0;
 }
 

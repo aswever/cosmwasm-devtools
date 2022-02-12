@@ -1,7 +1,7 @@
 import { SlIcon } from "@shoelace-style/shoelace/dist/react";
 import React, { FC } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { AddressBox } from "../../components/AddressBox";
+import { AccountCard } from "../../components/AccountCard";
 import { useKeplr } from "../../hooks/useKeplr";
 import { selectAccount, setKeplrAccount } from "./accountsSlice";
 import styles from "./KeplrAccount.module.css";
@@ -15,7 +15,7 @@ export const KeplrAccount: FC = () => {
   );
 
   return (
-    <AddressBox
+    <AccountCard
       icon={<SlIcon name="wallet2" className={styles.wallet} />}
       label={account?.label ?? "Connect wallet"}
       account={account}

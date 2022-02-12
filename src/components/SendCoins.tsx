@@ -35,6 +35,9 @@ export const SendCoins: FC = () => {
   function dispatchSend() {
     dispatch(sendCoins({ sender, recipient, amount, memo }));
     dispatch(setSendCoinsOpen(false));
+    setRecipient("");
+    setAmount("");
+    setMemo("");
   }
 
   return (

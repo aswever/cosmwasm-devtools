@@ -18,6 +18,9 @@ function App() {
     <div className="main">
       <aside className="sidebar">
         <h3 className="header">cøsmwasm devtøøls</h3>
+        <div className="subhead">
+          <a href="https://github.com">github</a> | <a href="#">donate</a>
+        </div>
         <SlDivider />
         <AccountList />
         <SlDivider />

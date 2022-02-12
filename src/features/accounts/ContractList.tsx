@@ -7,7 +7,7 @@ import {
 } from "./accountsSlice";
 import styles from "./ContractList.module.css";
 import { AddContract } from "./AddContract";
-import { AddressBox } from "../../components/AddressBox";
+import { AccountCard } from "../../components/AccountCard";
 import { Contract } from "../accounts/accountsSlice";
 
 interface ContractProps {
@@ -21,7 +21,7 @@ export const ContractDetails: FC<ContractProps> = ({ contract }) => {
   );
 
   return (
-    <AddressBox
+    <AccountCard
       label={contract.label || contract.address}
       account={contract}
       selected={selected}

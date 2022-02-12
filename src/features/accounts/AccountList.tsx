@@ -9,7 +9,7 @@ import {
 import styles from "./AccountList.module.css";
 import { AddAccount } from "./AddAccount";
 import { KeplrAccount } from "./KeplrAccount";
-import { AddressBox } from "../../components/AddressBox";
+import { AccountCard } from "../../components/AccountCard";
 import { SendCoins } from "../../components/SendCoins";
 
 interface AccountProps {
@@ -23,7 +23,7 @@ export const AccountInfo: FC<AccountProps> = ({ account }) => {
   );
 
   return (
-    <AddressBox
+    <AccountCard
       label={account?.label ?? account?.address}
       account={account}
       selected={selected}
