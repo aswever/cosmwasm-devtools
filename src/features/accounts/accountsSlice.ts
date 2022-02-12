@@ -4,7 +4,6 @@ import { RootState } from "../../app/store";
 import { Contract as CosmWasmContract } from "@cosmjs/cosmwasm-stargate";
 import { ClientType, getClient } from "../../services/getClient";
 import { toMicroAmount } from "../../util/coins";
-import { configSelector } from "../config/configSlice";
 
 export enum AccountType {
   Basic,
@@ -87,7 +86,7 @@ export const sendCoins = createAsyncThunk(
   ): Promise<boolean> => {
     const state = getState() as RootState;
     const senderAccount = state.accounts.accountList[sender];
-    const connection = await getClient(senderAccount, configSelector(state));
+    const connection = await getClient(senderAccount, state.config.entries);
     if (connection.clientType !== ClientType.Signing) {
       throw new Error("Client is not a signing client");
     }

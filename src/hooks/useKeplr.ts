@@ -4,7 +4,6 @@ import {
   AccountType,
   setKeplrAccount,
 } from "../features/accounts/accountsSlice";
-import { configSelector } from "../features/config/configSlice";
 import { getKeplr } from "../services/getClient";
 
 const CosmosCoinType = 118;
@@ -12,14 +11,14 @@ const CosmosCoinType = 118;
 export function useKeplr(): {
   connect: () => Promise<void>;
 } {
-  const config = useAppSelector(configSelector);
+  const config = useAppSelector((state) => state.config.entries);
   const dispatch = useAppDispatch();
 
   const getAccount = useCallback(async (): Promise<void> => {
     const keplr = await getKeplr();
 
     const { name: label, bech32Address: address } = await keplr.getKey(
-      config("chainId")
+      config["chainId"]
     );
 
     dispatch(setKeplrAccount({ label, address, type: AccountType.Keplr }));
@@ -28,14 +27,14 @@ export function useKeplr(): {
   const suggestChain = useCallback(async (): Promise<void> => {
     const keplr = await getKeplr();
 
-    const coin: string = config("coinName");
-    const coinDecimals = Number.parseInt(config("coinDecimals"));
-    const coinGeckoId: string = config("coinGeckoId");
-    const chainId: string = config("chainId");
-    const chainName: string = config("chainName");
-    const rpcEndpoint: string = config("rpcEndpoint");
-    const restEndpoint: string = config("restEndpoint");
-    const gasPrice = Number.parseFloat(config("gasPrice"));
+    const coin: string = config["coinName"];
+    const coinDecimals = Number.parseInt(config["coinDecimals"]);
+    const coinGeckoId: string = config["coinGeckoId"];
+    const chainId: string = config["chainId"];
+    const chainName: string = config["chainName"];
+    const rpcEndpoint: string = config["rpcEndpoint"];
+    const restEndpoint: string = config["restEndpoint"];
+    const gasPrice = Number.parseFloat(config["gasPrice"]);
     const coinDenom = coin.toUpperCase();
     const coinMinimalDenom = `u${coin}`;
 

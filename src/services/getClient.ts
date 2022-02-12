@@ -76,7 +76,7 @@ export async function getFaucet(endpoint: string): Promise<FaucetClient> {
 
 export async function getClient(
   account: Account | null,
-  config: (key: string) => string,
+  config: { [key: string]: string },
   forceRefresh = false
 ): Promise<ClientConnection> {
   if (
@@ -86,19 +86,19 @@ export async function getClient(
       connection.clientType === ClientType.Signing &&
       connection.address !== account.address)
   ) {
-    const rpcEndpoint: string = config("rpcEndpoint");
+    const rpcEndpoint: string = config["rpcEndpoint"];
 
     if (account && account.type !== AccountType.Contract) {
       let signer: OfflineSigner | null = null;
       const address = account.address;
       if (account.type === AccountType.Basic) {
-        const prefix: string = config("addressPrefix");
+        const prefix: string = config["addressPrefix"];
         signer = await DirectSecp256k1HdWallet.fromMnemonic(account.mnemonic, {
           prefix,
         });
       } else if (account.type === AccountType.Keplr) {
         const keplr = await getKeplr();
-        const chainId: string = config("chainId");
+        const chainId: string = config["chainId"];
         await keplr.enable(chainId);
         signer = keplr.getOfflineSigner(chainId);
       }
@@ -116,7 +116,7 @@ export async function getClient(
           signer,
           {
             gasPrice: GasPrice.fromString(
-              `${config("gasPrice")}${config("microDenom")}`
+              `${config["gasPrice"]}${config["microDenom"]}`
             ),
           }
         ),

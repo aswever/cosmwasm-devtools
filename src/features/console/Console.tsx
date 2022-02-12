@@ -11,7 +11,6 @@ import { selectedContract } from "../contracts/contractsSlice";
 import styles from "./Console.module.css";
 import { getClient, ClientType } from "../../services/getClient";
 import { selectedAccount } from "../accounts/accountsSlice";
-import { configSelector } from "../config/configSlice";
 
 const highlightColors = {
   keyColor: "black",
@@ -25,7 +24,7 @@ const highlightColors = {
 export const Console: FC = () => {
   const contract = useAppSelector(selectedContract);
   const account = useAppSelector(selectedAccount);
-  const config = useAppSelector(configSelector);
+  const config = useAppSelector((state) => state.config.entries);
 
   const [message, setMessage] = useState("");
   const [result, setResult] = useState("Response will appear here");

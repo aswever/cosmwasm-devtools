@@ -36,7 +36,4 @@ export const contractsSlice = createSlice({
 export const { setConfigModalOpen, setConfigEntry, setConfigEntries } =
   contractsSlice.actions;
 
-export const configSelector = (state: RootState) => (key: string) =>
-  state.config.entries[key];
-
 export default contractsSlice.reducer;

@@ -2,7 +2,7 @@ import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
 import React, { FC, useCallback, useEffect, useState } from "react";
 import styles from "./Connection.module.css";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { configSelector, setConfigModalOpen } from "./configSlice";
+import { setConfigModalOpen } from "./configSlice";
 import { getClient } from "../../services/getClient";
 import { pushMessage } from "../messages/messagesSlice";
 
@@ -18,7 +18,7 @@ export const Connection: FC = () => {
 
   const testConnection = useCallback(async () => {
     try {
-      const client = await getClient(null, (key) => config[key], true);
+      const client = await getClient(null, config, true);
       console.log(client);
       setConnected(true);
       setError(false);
