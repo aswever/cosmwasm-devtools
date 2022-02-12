@@ -16,6 +16,7 @@ export const KeplrAccount: FC = () => {
 
   return (
     <AccountCard
+      onClientChange={() => connect()}
       icon={<SlIcon name="wallet2" className={styles.wallet} />}
       label={account?.label ?? "Connect wallet"}
       account={account}

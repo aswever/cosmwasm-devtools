@@ -26,20 +26,8 @@
     "chainId": "Uni1",
     "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
     "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
-    "faucetEndpoint": "https://faucet.uni.juno.deuslabs.fi",
     "addressPrefix": "juno",
     "microDenom": "ujunox",
-    "coinDecimals": "6",
-    "gasPrice": "0.025"
-  },
-  "pebblenet": {
-    "chainName": "Pebblenet",
-    "chainId": "pebblenet-1",
-    "rpcEndpoint": "https://rpc.pebblenet.cosmwasm.com",
-    "restEndpoint": "https://lcd.pebblenet.cosmwasm.com",
-    "faucetEndpoint": "https://faucet.pebblenet.cosmwasm.com",
-    "addressPrefix": "wasm",
-    "microDenom": "upebble",
     "coinDecimals": "6",
     "gasPrice": "0.025"
   }

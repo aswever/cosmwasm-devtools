@@ -6,8 +6,8 @@ import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { ContractList } from "./features/accounts/ContractList";
 import { Console } from "./features/console/Console";
 import { SlDivider } from "@shoelace-style/shoelace/dist/react";
-import { Connection } from "./features/config/Connection";
-import { Configuration } from "./features/config/Configuration";
+import { Connection } from "./features/connection/Connection";
+import { Configuration } from "./features/connection/Configuration";
 import { Messages } from "./features/messages/Messages";
 import { ExecuteOptions } from "./features/console/ExecuteOptions";
 

@@ -18,6 +18,7 @@ interface AccountCardProps {
   selected: boolean;
   onClick: () => void;
   onClickX: () => void;
+  onClientChange?: () => void;
 }
 
 export const CHECK_BALANCE_INTERVAL = 30000;
@@ -29,9 +30,10 @@ export const AccountCard: FC<AccountCardProps> = ({
   selected,
   onClick,
   onClickX,
+  onClientChange,
 }) => {
   const dispatch = useAppDispatch();
-  const config = useAppSelector((state) => state.config.entries);
+  const config = useAppSelector((state) => state.connection.config);
   const balance = useAppSelector(balanceString(account?.address));
   const [copyTooltip, setCopyTooltip] = useState("Copy to clipboard");
 

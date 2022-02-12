@@ -7,14 +7,14 @@ import {
 } from "@shoelace-style/shoelace/dist/react";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input";
 import type SlSelectElement from "@shoelace-style/shoelace/dist/components/select/select";
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import styles from "./Configuration.module.css";
 import {
   checkConnection,
-  setConfigEntries,
+  setConnectionConfig,
   setConfigModalOpen,
-} from "./configSlice";
+} from "./connectionSlice";
 import presets from "./presets.json";
 
 // add basic validation
@@ -49,8 +49,8 @@ const config = {
 };
 
 export const Configuration: FC = () => {
-  const open = useAppSelector((state) => state.config.modalOpen);
-  const entries = useAppSelector((state) => state.config.entries);
+  const open = useAppSelector((state) => state.connection.modalOpen);
+  const entries = useAppSelector((state) => state.connection.config);
   const dispatch = useAppDispatch();
   const [localEntries, setLocalEntries] = useState(entries);
   const [preset, setPreset] = useState<keyof typeof presets>();
@@ -76,7 +76,7 @@ export const Configuration: FC = () => {
   }
 
   function save() {
-    dispatch(setConfigEntries(localEntries));
+    dispatch(setConnectionConfig(localEntries));
     dispatch(setConfigModalOpen(false));
     dispatch(checkConnection({ testing: true }));
   }

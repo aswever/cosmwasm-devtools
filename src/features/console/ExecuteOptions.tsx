@@ -15,7 +15,7 @@ import { fromMicroDenom } from "../../util/coins";
 export const ExecuteOptions: FC = () => {
   const dispatch = useAppDispatch();
   const open = useAppSelector((state) => state.console.optionsOpen);
-  const config = useAppSelector((state) => state.config.entries);
+  const config = useAppSelector((state) => state.connection.config);
   const [funds, setFunds] = useState("");
   const [memo, setMemo] = useState("");
   const [saveDefaults, setSaveDefaults] = useState(false);

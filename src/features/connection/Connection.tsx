@@ -4,14 +4,14 @@ import styles from "./Connection.module.css";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   checkConnection,
-  ConnectionState,
+  ConnectionStatus,
   setConfigModalOpen,
-} from "./configSlice";
+} from "./connectionSlice";
 
 export const Connection: FC = () => {
   const dispatch = useAppDispatch();
-  const config = useAppSelector((state) => state.config.entries);
-  const connection = useAppSelector((state) => state.config.connection);
+  const config = useAppSelector((state) => state.connection.config);
+  const connection = useAppSelector((state) => state.connection.status);
   const chainName: string = config["chainName"];
 
   useEffect(() => {
@@ -24,9 +24,9 @@ export const Connection: FC = () => {
     <SlCard className={classes}>
       <SlIcon
         name={
-          connection === ConnectionState.Connected
+          connection === ConnectionStatus.Connected
             ? "lightning-charge"
-            : connection === ConnectionState.Error
+            : connection === ConnectionStatus.Error
             ? "exclamation-octagon"
             : "asterisk"
         }

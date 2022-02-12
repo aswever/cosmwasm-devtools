@@ -2,23 +2,24 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { getClient } from "../../services/getClient";
 import { pushMessage } from "../messages/messagesSlice";
+import presets from "./presets.json";
 
-export enum ConnectionState {
+export enum ConnectionStatus {
   Connecting = "connecting",
   Connected = "connected",
   Error = "error",
 }
 
-export interface ConfigState {
-  entries: { [key: string]: string };
+export interface ConnectionState {
+  config: { [key: string]: string };
   modalOpen: boolean;
-  connection: ConnectionState;
+  status: ConnectionStatus;
 }
 
-const initialState: ConfigState = {
-  entries: {},
+const initialState: ConnectionState = {
+  config: presets["juno-local-test"],
   modalOpen: false,
-  connection: ConnectionState.Connecting,
+  status: ConnectionStatus.Connecting,
 };
 
 export const checkConnection = createAsyncThunk<
@@ -28,28 +29,28 @@ export const checkConnection = createAsyncThunk<
     }
   | undefined
 >(
-  "config/checkConnection",
+  "connection/checkConnection",
   async (
     { testing } = { testing: false },
     { dispatch, getState }
   ): Promise<void> => {
     const state = getState() as RootState;
-    const config = state.config.entries;
+    const connection = state.connection.config;
 
-    dispatch(setConnectionState(ConnectionState.Connecting));
+    dispatch(setConnectionStatus(ConnectionStatus.Connecting));
     try {
-      await getClient(null, config, testing);
-      dispatch(setConnectionState(ConnectionState.Connected));
+      await getClient(null, connection, testing);
+      dispatch(setConnectionStatus(ConnectionStatus.Connected));
       if (testing)
         dispatch(
           pushMessage({
             status: "success",
-            message: `Successfully connected to ${config["chainName"]}`,
+            message: `Successfully connected to ${connection["chainName"]}`,
           })
         );
     } catch (e) {
       console.error(e);
-      dispatch(setConnectionState(ConnectionState.Error));
+      dispatch(setConnectionStatus(ConnectionStatus.Error));
       if (testing)
         dispatch(
           pushMessage({ status: "danger", message: "Connection failed" })
@@ -58,36 +59,36 @@ export const checkConnection = createAsyncThunk<
   }
 );
 
-export const configSlice = createSlice({
-  name: "config",
+export const connectionSlice = createSlice({
+  name: "connection",
   initialState,
   reducers: {
     setConfigModalOpen: (state, action: PayloadAction<boolean>) => {
       state.modalOpen = action.payload;
     },
-    setConfigEntry: (
+    setConnectionConfigItem: (
       state,
       action: PayloadAction<{ key: string; value: string }>
     ) => {
-      state.entries[action.payload.key] = action.payload.value;
+      state.config[action.payload.key] = action.payload.value;
     },
-    setConfigEntries: (
+    setConnectionConfig: (
       state,
       action: PayloadAction<{ [key: string]: string }>
     ) => {
-      state.entries = action.payload;
+      state.config = action.payload;
     },
-    setConnectionState: (state, action: PayloadAction<ConnectionState>) => {
-      state.connection = action.payload;
+    setConnectionStatus: (state, action: PayloadAction<ConnectionStatus>) => {
+      state.status = action.payload;
     },
   },
 });
 
 export const {
   setConfigModalOpen,
-  setConfigEntry,
-  setConfigEntries,
-  setConnectionState,
-} = configSlice.actions;
+  setConnectionConfigItem,
+  setConnectionConfig,
+  setConnectionStatus,
+} = connectionSlice.actions;
 
-export default configSlice.reducer;
+export default connectionSlice.reducer;

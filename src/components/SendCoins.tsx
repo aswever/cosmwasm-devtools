@@ -23,7 +23,7 @@ export const SendCoins: FC = () => {
   const dispatch = useAppDispatch();
   const open = useAppSelector((state) => state.accounts.sendCoinsOpen);
   const sender = useAppSelector((state) => state.accounts.currentAccount!);
-  const config = useAppSelector((state) => state.config.entries);
+  const config = useAppSelector((state) => state.connection.config);
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");

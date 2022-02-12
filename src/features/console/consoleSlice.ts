@@ -67,7 +67,7 @@ export const query = (): AppThunk => (dispatch, getState) => {
     run(async (queryObj) => {
       const contract = selectedContract(getState());
       if (!contract) throw new Error("No contract selected");
-      const querier = await getClient(null, getState().config.entries);
+      const querier = await getClient(null, getState().connection.config);
       return querier.client.queryContractSmart(contract.address, queryObj);
     })
   );
@@ -84,7 +84,7 @@ export const execute =
   (dispatch, getState) => {
     dispatch(
       run(async (executeObj) => {
-        const config = getState().config.entries;
+        const config = getState().connection.config;
         const contract = selectedContract(getState());
         const account = selectedAccount(getState());
         if (!contract) throw new Error("No contract selected");

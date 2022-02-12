@@ -2,9 +2,10 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { coin, Coin, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { RootState } from "../../app/store";
 import { Contract as CosmWasmContract } from "@cosmjs/cosmwasm-stargate";
-import { ClientType, getClient, getFaucet } from "../../services/getClient";
+import { ClientType, getClient } from "../../services/getClient";
 import { fromMicroCoin, toMicroAmount } from "../../util/coins";
 import { pushMessage } from "../messages/messagesSlice";
+import { FaucetClient } from "@cosmjs/faucet-client";
 
 export enum AccountType {
   Basic,
@@ -61,7 +62,7 @@ export const importAccount = createAsyncThunk(
     { getState }
   ): Promise<BasicAccount> => {
     const state = getState() as RootState;
-    const config = state.config.entries;
+    const config = state.connection.config;
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
       prefix: config["addressPrefix"],
     });
@@ -80,7 +81,7 @@ export const importContract = createAsyncThunk(
   "accounts/importContract",
   async (address: string, { getState }): Promise<Contract> => {
     const state = getState() as RootState;
-    const config = state.config.entries;
+    const config = state.connection.config;
     const querier = await getClient(null, config);
     const contract = await querier.client.getContract(address);
 
@@ -100,7 +101,7 @@ export const checkBalance = createAsyncThunk(
   "accounts/checkBalance",
   async (address: string, { getState }): Promise<Coin> => {
     const state = getState() as RootState;
-    const config = state.config.entries;
+    const config = state.connection.config;
     const denom: string = config["microDenom"];
     const { client } = await getClient(null, config);
     return client.getBalance(address, denom);
@@ -111,8 +112,8 @@ export const hitFaucet = createAsyncThunk(
   "accounts/hitFaucet",
   async (address: string, { getState, dispatch }): Promise<void> => {
     const state = getState() as RootState;
-    const config = state.config.entries;
-    const faucet = await getFaucet(config["faucetEndpoint"]);
+    const config = state.connection.config;
+    const faucet = new FaucetClient(config["faucetEndpoint"]);
     dispatch(
       pushMessage({
         status: "neutral",
@@ -160,15 +161,21 @@ export const sendCoins = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const senderAccount = state.accounts.accountList[sender];
-      const connection = await getClient(senderAccount, state.config.entries);
+      const connection = await getClient(
+        senderAccount,
+        state.connection.config
+      );
       if (connection.clientType !== ClientType.Signing) {
         throw new Error("Client is not a signing client");
       }
 
       const coinsAmount = [
         {
-          amount: toMicroAmount(amount, state.config.entries["coinDecimals"]),
-          denom: state.config.entries["microDenom"],
+          amount: toMicroAmount(
+            amount,
+            state.connection.config["coinDecimals"]
+          ),
+          denom: state.connection.config["microDenom"],
         },
       ];
 
@@ -284,7 +291,7 @@ export const selectedAccount = (state: RootState) =>
     : undefined;
 
 export const balanceString = (address?: string) => (state: RootState) => {
-  const config = state.config.entries;
+  const config = state.connection.config;
   if (!address) return `0${config["microDenom"]}`;
 
   const account = state.accounts.accountList[address];
