@@ -18,8 +18,10 @@ export const Connection: FC = () => {
     dispatch(checkConnection());
   }, [dispatch]);
 
+  const classes = [styles.connection, styles[`state-${connection}`]].join(" ");
+
   return (
-    <SlCard className={styles.adder}>
+    <SlCard className={classes}>
       <SlIcon
         name={
           connection === ConnectionState.Connected
@@ -28,7 +30,7 @@ export const Connection: FC = () => {
             ? "exclamation-octagon"
             : "asterisk"
         }
-        className={styles.connection}
+        className={styles.stateIcon}
       />
       <div className={styles.chainName}>{chainName}</div>
       <SlIcon

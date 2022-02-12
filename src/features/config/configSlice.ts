@@ -4,9 +4,9 @@ import { getClient } from "../../services/getClient";
 import { pushMessage } from "../messages/messagesSlice";
 
 export enum ConnectionState {
-  Connecting,
-  Connected,
-  Error,
+  Connecting = "connecting",
+  Connected = "connected",
+  Error = "error",
 }
 
 export interface ConfigState {
