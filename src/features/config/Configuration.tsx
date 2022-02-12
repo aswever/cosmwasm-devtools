@@ -64,7 +64,9 @@ export const Configuration: FC = () => {
       localEntries === entries ||
       window.confirm("Are you sure you want to discard your changes?")
     ) {
-      setLocalEntries(entries);
+      if (localEntries !== entries) {
+        setLocalEntries(entries);
+      }
       dispatch(setConfigModalOpen(false));
     } else {
       event.preventDefault();
@@ -73,6 +75,7 @@ export const Configuration: FC = () => {
 
   function save() {
     dispatch(setConfigEntries(localEntries));
+    dispatch(setConfigModalOpen(false));
   }
 
   function setEntry(key: string, value: string) {

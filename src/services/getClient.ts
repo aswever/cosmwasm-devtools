@@ -76,9 +76,11 @@ export async function getFaucet(endpoint: string): Promise<FaucetClient> {
 
 export async function getClient(
   account: Account | null,
-  config: (key: string) => string
+  config: (key: string) => string,
+  forceRefresh = false
 ): Promise<ClientConnection> {
   if (
+    forceRefresh ||
     !connection ||
     (account &&
       connection.clientType === ClientType.Signing &&

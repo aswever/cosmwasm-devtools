@@ -17,7 +17,7 @@ interface AddressBoxProps {
   onClickX: () => void;
 }
 
-export const CHECK_BALANCE_INTERVAL = 10000;
+export const CHECK_BALANCE_INTERVAL = 30000;
 
 export const AddressBox: FC<AddressBoxProps> = ({
   icon,
@@ -29,7 +29,7 @@ export const AddressBox: FC<AddressBoxProps> = ({
 }) => {
   const [balance, setBalance] = useState("");
   const [sendCoinsOpen, setSendCoinsOpen] = useState(false);
-  const config = useAppSelector(configSelector);
+  const config = useAppSelector((state) => state.config.entries);
 
   const classes = [styles.addressBox];
   if (selected) {
@@ -43,20 +43,20 @@ export const AddressBox: FC<AddressBoxProps> = ({
   });
 
   const getBalance = useCallback(async () => {
-    const denom: string = config("microDenom");
+    const denom: string = config["microDenom"];
     if (!account) return setBalance(`0${fromMicroDenom(denom)}`);
-    const { client } = await getClient(account, config);
+    const { client } = await getClient(account, (key) => config[key]);
     const balance = fromMicroCoin(
       await client.getBalance(account.address, denom),
-      config("coinDecimals")
+      config["coinDecimals"]
     );
     setBalance(`${balance.amount}${balance.denom}`);
   }, [account, config]);
 
   const getCoins = useCallback(async () => {
     if (!account) throw new Error("no account selected");
-    const faucet = await getFaucet(config("faucetEndpoint"));
-    faucet.credit(account.address, config("microDenom"));
+    const faucet = await getFaucet(config["faucetEndpoint"]);
+    faucet.credit(account.address, config["microDenom"]);
   }, [account, config]);
 
   return (
@@ -69,7 +69,7 @@ export const AddressBox: FC<AddressBoxProps> = ({
           </div>
           {account?.type !== AccountType.Contract && selected && (
             <>
-              {config("faucetEndpoint") && (
+              {config["faucetEndpoint"] && (
                 <SlIcon
                   name="coin"
                   className={styles.close}

@@ -8,6 +8,7 @@ import { Console } from "./features/console/Console";
 import { SlDivider } from "@shoelace-style/shoelace/dist/react";
 import { Connection } from "./features/config/Connection";
 import { Configuration } from "./features/config/Configuration";
+import { Messages } from "./features/messages/Messages";
 
 setBasePath(
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.64/dist/"
@@ -28,6 +29,7 @@ function App() {
         <Console />
       </section>
       <Configuration />
+      <Messages />
     </div>
   );
 }
