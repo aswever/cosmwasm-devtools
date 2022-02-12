@@ -23,11 +23,14 @@ function App() {
           <a href="https://github.com">github</a> | <a href="#">donate</a>
         </div>
         <SlDivider />
-        <AccountList />
-        <SlDivider />
-        <ContractList />
-        <SlDivider />
-        <Connection />
+        <div className="sidebar-main">
+          <AccountList />
+          <SlDivider />
+          <ContractList />
+        </div>
+        <div className="connection">
+          <Connection />
+        </div>
       </aside>
       <section className="console">
         <Console />
