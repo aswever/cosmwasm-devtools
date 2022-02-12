@@ -2,9 +2,9 @@ import { SlIcon } from "@shoelace-style/shoelace/dist/react";
 import React, { FC } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { AccountCard } from "../../components/AccountCard";
-import { useKeplr } from "../../hooks/useKeplr";
 import { selectAccount, setKeplrAccount } from "./accountsSlice";
 import styles from "./KeplrAccount.module.css";
+import { useKeplr } from "./useKeplr";
 
 export const KeplrAccount: FC = () => {
   const dispatch = useAppDispatch();

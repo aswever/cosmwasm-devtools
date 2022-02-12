@@ -8,9 +8,38 @@ const CosmosCoinType = 118;
 
 let savedKeplr: Keplr;
 
+export async function getKeplr(): Promise<Keplr> {
+  let keplr: Keplr | undefined;
+  if (savedKeplr) {
+    keplr = savedKeplr;
+  } else if (window.keplr) {
+    keplr = window.keplr;
+  } else if (document.readyState === "complete") {
+    keplr = window.keplr;
+  } else {
+    keplr = await new Promise((resolve) => {
+      const documentStateChange = (event: Event) => {
+        if (
+          event.target &&
+          (event.target as Document).readyState === "complete"
+        ) {
+          resolve(window.keplr);
+          document.removeEventListener("readystatechange", documentStateChange);
+        }
+      };
+
+      document.addEventListener("readystatechange", documentStateChange);
+    });
+  }
+
+  if (!keplr) throw new Error("Keplr not found");
+  if (!savedKeplr) savedKeplr = keplr;
+
+  return keplr;
+}
+
 export function useKeplr(): {
   connect: () => Promise<void>;
-  getKeplr: () => Promise<Keplr>;
 } {
   const config = useAppSelector((state) => state.connection.config);
   const dispatch = useAppDispatch();
@@ -35,39 +64,6 @@ export function useKeplr(): {
   useEffect(() => {
     getKeplr();
   }, []);
-
-  const getKeplr = async (): Promise<Keplr> => {
-    let keplr: Keplr | undefined;
-    if (savedKeplr) {
-      keplr = savedKeplr;
-    } else if (window.keplr) {
-      keplr = window.keplr;
-    } else if (document.readyState === "complete") {
-      keplr = window.keplr;
-    } else {
-      keplr = await new Promise((resolve) => {
-        const documentStateChange = (event: Event) => {
-          if (
-            event.target &&
-            (event.target as Document).readyState === "complete"
-          ) {
-            resolve(window.keplr);
-            document.removeEventListener(
-              "readystatechange",
-              documentStateChange
-            );
-          }
-        };
-
-        document.addEventListener("readystatechange", documentStateChange);
-      });
-    }
-
-    if (!keplr) throw new Error("Keplr not found");
-    if (!savedKeplr) savedKeplr = keplr;
-
-    return keplr;
-  };
 
   const suggestChain = useCallback(async (): Promise<void> => {
     const keplr = await getKeplr();
@@ -134,5 +130,5 @@ export function useKeplr(): {
     await suggestChain();
   }, [getAccount, suggestChain]);
 
-  return { connect, getKeplr };
+  return { connect };
 }

@@ -2,10 +2,10 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { coin, Coin, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { RootState } from "../../app/store";
 import { Contract as CosmWasmContract } from "@cosmjs/cosmwasm-stargate";
-import { ClientType, getClient } from "../../services/getClient";
 import { fromMicroCoin, toMicroAmount } from "../../util/coins";
 import { pushMessage } from "../messages/messagesSlice";
 import { FaucetClient } from "@cosmjs/faucet-client";
+import connectionManager from "../connection/connectionManager";
 
 export enum AccountType {
   Basic,
@@ -82,8 +82,8 @@ export const importContract = createAsyncThunk(
   async (address: string, { getState }): Promise<Contract> => {
     const state = getState() as RootState;
     const config = state.connection.config;
-    const querier = await getClient(null, config);
-    const contract = await querier.client.getContract(address);
+    const client = await connectionManager.getQueryClient(config);
+    const contract = await client.getContract(address);
 
     const { label } = contract;
 
@@ -103,7 +103,7 @@ export const checkBalance = createAsyncThunk(
     const state = getState() as RootState;
     const config = state.connection.config;
     const denom: string = config["microDenom"];
-    const { client } = await getClient(null, config);
+    const client = await connectionManager.getQueryClient(config);
     return client.getBalance(address, denom);
   }
 );
@@ -161,13 +161,10 @@ export const sendCoins = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const senderAccount = state.accounts.accountList[sender];
-      const connection = await getClient(
+      const client = await connectionManager.getSigningClient(
         senderAccount,
         state.connection.config
       );
-      if (connection.clientType !== ClientType.Signing) {
-        throw new Error("Client is not a signing client");
-      }
 
       const coinsAmount = [
         {
@@ -179,7 +176,7 @@ export const sendCoins = createAsyncThunk(
         },
       ];
 
-      const { code } = await connection.client.sendTokens(
+      const { code } = await client.sendTokens(
         sender,
         recipient,
         coinsAmount,

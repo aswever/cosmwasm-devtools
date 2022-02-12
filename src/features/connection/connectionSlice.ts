@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { config } from "process";
 import { RootState } from "../../app/store";
-import { getClient } from "../../services/getClient";
 import { pushMessage } from "../messages/messagesSlice";
+import connectionManager from "./connectionManager";
 import presets from "./presets.json";
 
 export enum ConnectionStatus {
@@ -35,17 +36,17 @@ export const checkConnection = createAsyncThunk<
     { dispatch, getState }
   ): Promise<void> => {
     const state = getState() as RootState;
-    const connection = state.connection.config;
+    const config = state.connection.config;
 
     dispatch(setConnectionStatus(ConnectionStatus.Connecting));
     try {
-      await getClient(null, connection, testing);
+      await connectionManager.getQueryClient(config, testing);
       dispatch(setConnectionStatus(ConnectionStatus.Connected));
       if (testing)
         dispatch(
           pushMessage({
             status: "success",
-            message: `Successfully connected to ${connection["chainName"]}`,
+            message: `Successfully connected to ${config["chainName"]}`,
           })
         );
     } catch (e) {

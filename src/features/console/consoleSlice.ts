@@ -1,10 +1,9 @@
 import { coins } from "@cosmjs/proto-signing";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { memo } from "react";
 import { AppThunk, RootState } from "../../app/store";
-import { ClientType, getClient } from "../../services/getClient";
 import { toMicroAmount } from "../../util/coins";
 import { selectedAccount, selectedContract } from "../accounts/accountsSlice";
+import connectionManager from "../connection/connectionManager";
 
 export const highlightColors = {
   keyColor: "black",
@@ -67,8 +66,10 @@ export const query = (): AppThunk => (dispatch, getState) => {
     run(async (queryObj) => {
       const contract = selectedContract(getState());
       if (!contract) throw new Error("No contract selected");
-      const querier = await getClient(null, getState().connection.config);
-      return querier.client.queryContractSmart(contract.address, queryObj);
+      const client = await connectionManager.getQueryClient(
+        getState().connection.config
+      );
+      return client.queryContractSmart(contract.address, queryObj);
     })
   );
 };
@@ -90,15 +91,16 @@ export const execute =
         if (!contract) throw new Error("No contract selected");
         if (!account) throw new Error("No account selected");
 
-        const connection = await getClient(account, config);
-        if (connection.clientType !== ClientType.Signing)
-          throw new Error("Failed to get signing client");
+        const client = await connectionManager.getSigningClient(
+          account,
+          config
+        );
 
         const executeOptions = getState().console.executeOptions;
         const executeMemo = memo ?? executeOptions?.memo;
         const executeFunds = funds ?? executeOptions?.funds;
 
-        return connection.client.execute(
+        return client.execute(
           account.address,
           contract.address,
           executeObj,
