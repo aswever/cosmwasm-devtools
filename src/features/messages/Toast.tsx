@@ -15,20 +15,22 @@ export const Toast: FC<ToastProps> = ({ msg }) => {
   useEffect(() => {
     if (msgRef.current) {
       msgRef.current.toast();
-      // setTimeout(() => dispatch(shiftMessage()), 3000);
+      setTimeout(() => dispatch(shiftMessage()), 3000);
     }
   }, [msg, dispatch]);
 
   return (
-    <SlAlert ref={msgRef} variant={msg.level} duration={3000} closable>
-      <SlIcon slot="icon" name="check2-circle" />
-      {msg.header && (
-        <>
-          <strong>{msg.header}</strong>
-          <br />
-        </>
-      )}
-      {msg.message}
-    </SlAlert>
+    <div>
+      <SlAlert ref={msgRef} variant={msg.level} duration={3000} closable>
+        <SlIcon slot="icon" name="check2-circle" />
+        {msg.header && (
+          <>
+            <strong>{msg.header}</strong>
+            <br />
+          </>
+        )}
+        {msg.message}
+      </SlAlert>
+    </div>
   );
 };

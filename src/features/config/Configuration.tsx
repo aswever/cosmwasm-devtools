@@ -10,7 +10,11 @@ import type SlSelectElement from "@shoelace-style/shoelace/dist/components/selec
 import React, { FC, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import styles from "./Configuration.module.css";
-import { setConfigEntries, setConfigModalOpen } from "./configSlice";
+import {
+  checkConnection,
+  setConfigEntries,
+  setConfigModalOpen,
+} from "./configSlice";
 import presets from "./presets.json";
 
 // add basic validation
@@ -64,9 +68,7 @@ export const Configuration: FC = () => {
       localEntries === entries ||
       window.confirm("Are you sure you want to discard your changes?")
     ) {
-      if (localEntries !== entries) {
-        setLocalEntries(entries);
-      }
+      if (localEntries !== entries) setLocalEntries(entries);
       dispatch(setConfigModalOpen(false));
     } else {
       event.preventDefault();
@@ -76,6 +78,7 @@ export const Configuration: FC = () => {
   function save() {
     dispatch(setConfigEntries(localEntries));
     dispatch(setConfigModalOpen(false));
+    dispatch(checkConnection({ testing: true }));
   }
 
   function setEntry(key: string, value: string) {

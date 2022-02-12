@@ -1,46 +1,30 @@
 import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, { FC, useEffect } from "react";
 import styles from "./Connection.module.css";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { setConfigModalOpen } from "./configSlice";
-import { getClient } from "../../services/getClient";
-import { pushMessage } from "../messages/messagesSlice";
+import {
+  checkConnection,
+  ConnectionState,
+  setConfigModalOpen,
+} from "./configSlice";
 
 export const Connection: FC = () => {
   const dispatch = useAppDispatch();
   const config = useAppSelector((state) => state.config.entries);
+  const connection = useAppSelector((state) => state.config.connection);
   const chainName: string = config["chainName"];
-  const [connected, setConnected] = useState(false);
-  const [error, setError] = useState(false);
-  useEffect(() => {
-    console.log("config changed");
-  }, [config]);
-
-  const testConnection = useCallback(async () => {
-    try {
-      const client = await getClient(null, config, true);
-      console.log(client);
-      setConnected(true);
-      setError(false);
-    } catch (e) {
-      console.error(e);
-      setConnected(false);
-      setError(true);
-      dispatch(pushMessage({ level: "danger", message: "Connection failed" }));
-    }
-  }, [config, dispatch]);
 
   useEffect(() => {
-    testConnection();
-  }, [testConnection]);
+    dispatch(checkConnection());
+  }, [dispatch]);
 
   return (
     <SlCard className={styles.adder}>
       <SlIcon
         name={
-          connected
+          connection === ConnectionState.Connected
             ? "lightning-charge"
-            : error
+            : connection === ConnectionState.Error
             ? "exclamation-octagon"
             : "asterisk"
         }
