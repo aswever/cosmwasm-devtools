@@ -1,6 +1,6 @@
 import { SlCard, SlIcon, SlTooltip } from "@shoelace-style/shoelace/dist/react";
-import React, { FC, useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import React, { FC, useCallback, useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   Account,
   AccountType,
@@ -8,7 +8,7 @@ import {
   checkBalance,
   hitFaucet,
   setSendCoinsOpen,
-} from "../features/accounts/accountsSlice";
+} from "./accountsSlice";
 import styles from "./AccountCard.module.css";
 
 interface AccountCardProps {
@@ -61,17 +61,25 @@ export const AccountCard: FC<AccountCardProps> = ({
     }
   }, [account?.address, dispatch, config]);
 
-  function copyAddress() {
+  const copyAddress = useCallback(() => {
     if (account?.address) navigator.clipboard.writeText(account.address);
     setCopyTooltip("Copied!");
     setTimeout(() => setCopyTooltip("Copy to clipboard"), 2000);
-  }
+  }, [account?.address]);
+
+  const clickX = useCallback(
+    (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      e.preventDefault();
+      onClickX();
+    },
+    [onClickX]
+  );
 
   return (
     <>
       <SlCard
         className={classes.join(" ")}
-        onClick={disabled ? undefined : onClick}
+        onClick={disabled || selected ? undefined : onClick}
       >
         <div className={styles.main}>
           <div className={styles.left}>
@@ -108,7 +116,7 @@ export const AccountCard: FC<AccountCardProps> = ({
                   : "Remove account"
               }
             >
-              <SlIcon name="x-lg" className={styles.close} onClick={onClickX} />
+              <SlIcon name="x-lg" className={styles.close} onClick={clickX} />
             </SlTooltip>
           )}
         </div>

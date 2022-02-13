@@ -8,7 +8,7 @@ import {
 } from "./accountsSlice";
 import styles from "./ContractList.module.css";
 import { AddContract } from "./AddContract";
-import { AccountCard } from "../../components/AccountCard";
+import { AccountCard } from "./AccountCard";
 import { Contract } from "../accounts/accountsSlice";
 
 interface ContractProps {

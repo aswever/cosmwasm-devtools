@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { config } from "process";
 import { RootState } from "../../app/store";
 import { pushMessage } from "../messages/messagesSlice";
 import connectionManager from "./connectionManager";

@@ -10,6 +10,8 @@ import { Connection } from "./features/connection/Connection";
 import { Configuration } from "./features/connection/Configuration";
 import { Messages } from "./features/messages/Messages";
 import { ExecuteOptions } from "./features/console/ExecuteOptions";
+import { Header } from "./components/Header";
+import { Donate } from "./features/accounts/Donate";
 
 setBasePath(
   "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.64/dist/"
@@ -18,10 +20,7 @@ function App() {
   return (
     <div className="main">
       <aside className="sidebar">
-        <h3 className="header">cøsmwasm devtøøls</h3>
-        <div className="subhead">
-          <a href="https://github.com">github</a> | <a href="#">donate</a>
-        </div>
+        <Header />
         <SlDivider />
         <div className="sidebar-main">
           <AccountList />
@@ -38,6 +37,7 @@ function App() {
       <Configuration />
       <Messages />
       <ExecuteOptions />
+      <Donate />
     </div>
   );
 }

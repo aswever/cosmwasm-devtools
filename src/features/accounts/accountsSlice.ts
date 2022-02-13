@@ -43,11 +43,13 @@ export interface AccountsState {
   currentAccount?: string;
   currentContract?: string;
   sendCoinsOpen: boolean;
+  donationOpen: boolean;
 }
 
 const initialState: AccountsState = {
   accountList: {},
   sendCoinsOpen: false,
+  donationOpen: false,
 };
 
 export const importAccount = createAsyncThunk(
@@ -204,29 +206,35 @@ export const sendCoins = createAsyncThunk(
       recipient,
       amount,
       memo,
+      customConfig,
     }: {
       sender: string;
       recipient: string;
       amount: string;
       memo?: string;
+      customConfig?: { [key: string]: string };
     },
     { getState, dispatch }
   ): Promise<void> => {
     try {
       const state = getState() as RootState;
+      const config = customConfig ?? state.connection.config;
       const senderAccount = state.accounts.accountList[sender];
+
+      console.log(sender, senderAccount);
+      if (!sender) {
+        throw new Error("No account selected");
+      }
+
       const client = await connectionManager.getSigningClient(
         senderAccount,
-        state.connection.config
+        config
       );
 
       const coinsAmount = [
         {
-          amount: toMicroAmount(
-            amount,
-            state.connection.config["coinDecimals"]
-          ),
-          denom: state.connection.config["microDenom"],
+          amount: toMicroAmount(amount, config["coinDecimals"]),
+          denom: config["microDenom"],
         },
       ];
 
@@ -281,6 +289,17 @@ export const accountsSlice = createSlice({
       if (account) {
         state.accountList[account.address] = account;
       } else {
+        console.log(
+          state.currentAccount,
+          state.currentAccount &&
+            state.accountList[state.currentAccount]?.type === AccountType.Keplr
+        );
+        if (
+          state.currentAccount &&
+          state.accountList[state.currentAccount]?.type === AccountType.Keplr
+        ) {
+          state.currentAccount = undefined;
+        }
         delete state.accountList[state.keplrAccount!.address];
       }
 
@@ -298,6 +317,9 @@ export const accountsSlice = createSlice({
     },
     setSendCoinsOpen: (state, action: PayloadAction<boolean>) => {
       state.sendCoinsOpen = action.payload;
+    },
+    setDonationOpen: (state, action: PayloadAction<boolean>) => {
+      state.donationOpen = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -350,6 +372,7 @@ export const {
   setKeplrAccount,
   setAccountBalance,
   setSendCoinsOpen,
+  setDonationOpen,
 } = accountsSlice.actions;
 
 export const selectedAccount = (state: RootState) =>

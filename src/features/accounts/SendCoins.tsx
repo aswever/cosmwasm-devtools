@@ -10,15 +10,15 @@ import {
 import type SlSelectElement from "@shoelace-style/shoelace/dist/components/select/select";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input";
 import React, { FC, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import styles from "./SendCoins.module.css";
 import {
   AccountType,
   contractAccounts,
   sendCoins,
   setSendCoinsOpen,
-} from "../features/accounts/accountsSlice";
-import { fromMicroDenom } from "../util/coins";
+} from "./accountsSlice";
+import { fromMicroDenom } from "../../util/coins";
 
 export const SendCoins: FC = () => {
   const dispatch = useAppDispatch();

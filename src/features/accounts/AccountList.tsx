@@ -9,8 +9,8 @@ import {
 import styles from "./AccountList.module.css";
 import { AddAccount } from "./AddAccount";
 import { KeplrAccount } from "./KeplrAccount";
-import { AccountCard } from "../../components/AccountCard";
-import { SendCoins } from "../../components/SendCoins";
+import { AccountCard } from "./AccountCard";
+import { SendCoins } from "./SendCoins";
 
 interface AccountProps {
   account: Account;
