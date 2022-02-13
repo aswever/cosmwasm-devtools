@@ -288,12 +288,8 @@ export const accountsSlice = createSlice({
 
       if (account) {
         state.accountList[account.address] = account;
+        state.currentAccount = account.address;
       } else {
-        console.log(
-          state.currentAccount,
-          state.currentAccount &&
-            state.accountList[state.currentAccount]?.type === AccountType.Keplr
-        );
         if (
           state.currentAccount &&
           state.accountList[state.currentAccount]?.type === AccountType.Keplr
