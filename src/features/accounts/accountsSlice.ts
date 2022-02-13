@@ -323,9 +323,7 @@ export const accountsSlice = createSlice({
       .addCase(importAccount.fulfilled, (state, action) => {
         const account = action.payload;
         state.accountList[account.address] = account;
-        if (!state.currentAccount) {
-          state.currentAccount = account.address;
-        }
+        state.currentAccount = account.address;
       })
       .addCase(checkBalance.fulfilled, (state, action) => {
         const address = action.meta.arg;
@@ -338,9 +336,7 @@ export const accountsSlice = createSlice({
       .addCase(importContract.fulfilled, (state, action) => {
         const account = action.payload;
         state.accountList[account.address] = account;
-        if (!state.currentContract) {
-          state.currentContract = account.address;
-        }
+        state.currentContract = account.address;
       })
       .addCase(checkContract.fulfilled, (state, action) => {
         const newAccountInfo = action.payload;
