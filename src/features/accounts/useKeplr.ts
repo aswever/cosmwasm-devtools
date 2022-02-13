@@ -3,6 +3,7 @@ import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { AccountType, setKeplrAccount } from "../accounts/accountsSlice";
 import { Keplr } from "@keplr-wallet/types";
+import { pushMessage } from "../messages/messagesSlice";
 
 const CosmosCoinType = 118;
 
@@ -62,8 +63,18 @@ export function useKeplr(): {
   }, [dispatch, config]);
 
   useEffect(() => {
-    getKeplr();
-  }, []);
+    try {
+      getKeplr();
+    } catch (e) {
+      dispatch(
+        pushMessage({
+          status: "danger",
+          header: "Keplr not found",
+          message: e instanceof Error ? e.message : JSON.stringify(e),
+        })
+      );
+    }
+  }, [dispatch]);
 
   const suggestChain = useCallback(async (): Promise<void> => {
     const keplr = await getKeplr();
@@ -126,9 +137,19 @@ export function useKeplr(): {
   }, [config]);
 
   const connect = useCallback(async (): Promise<void> => {
-    await getAccount();
-    await suggestChain();
-  }, [getAccount, suggestChain]);
+    try {
+      await getAccount();
+      await suggestChain();
+    } catch (e) {
+      dispatch(
+        pushMessage({
+          status: "danger",
+          header: "Keplr connection failed",
+          message: e instanceof Error ? e.message : JSON.stringify(e),
+        })
+      );
+    }
+  }, [getAccount, suggestChain, dispatch]);
 
   return { connect };
 }
