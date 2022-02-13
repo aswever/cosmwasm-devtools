@@ -17,6 +17,7 @@
   font-family: "Courier New", Courier, monospace;
   font-size: 0.9em;
   cursor: pointer;
+  padding: 0;
 }
 
 .link:hover {
