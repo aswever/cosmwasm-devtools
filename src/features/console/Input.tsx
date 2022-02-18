@@ -17,6 +17,7 @@ import {
   query,
   highlightColors,
   setOptionsOpen,
+  sign,
 } from "./consoleSlice";
 import { AppThunk } from "../../app/store";
 
@@ -54,6 +55,9 @@ export const Input: FC = () => {
           <SlDropdown>
             <SlButton slot="trigger" caret></SlButton>
             <SlMenu>
+              <SlMenuItem onClick={() => run(sign())}>
+                Sign
+              </SlMenuItem>
               <SlMenuItem onClick={() => dispatch(setOptionsOpen(true))}>
                 Execute with...
               </SlMenuItem>

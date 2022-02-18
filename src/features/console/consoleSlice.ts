@@ -1,9 +1,13 @@
 import { coins } from "@cosmjs/proto-signing";
+import { serializeSignDoc, Secp256k1HdWallet } from '@cosmjs/launchpad';
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "../../app/store";
 import { toMicroAmount } from "../../util/coins";
-import { selectedAccount, selectedContract } from "../accounts/accountsSlice";
+import { selectedAccount, selectedContract, AccountType } from "../accounts/accountsSlice";
 import connectionManager from "../connection/connectionManager";
+import { StdSignature } from "@cosmjs/amino";
+import { getKeplr } from "../accounts/useKeplr";
+import { makeADR36AminoSignDoc } from "../../util/adr36";
 
 export const highlightColors = {
   keyColor: "black",
@@ -34,7 +38,41 @@ const initialState: ConsoleState = {
   optionsOpen: false,
 };
 
-class ConsoleError extends Error {}
+class ConsoleError extends Error { }
+
+export const sign = (): AppThunk => (dispatch, getState) => {
+  dispatch(
+    run(async (msgObj) => {
+      const account = selectedAccount(getState());
+      if (!account) throw new Error("No account selected");
+
+      const signDoc = makeADR36AminoSignDoc(
+        account.address,
+        JSON.stringify(msgObj),
+      );
+
+      let stdSig: StdSignature;
+
+      if (account.type === AccountType.Keplr) {
+        const keplr = await getKeplr();
+        const chainId = getState().connection.config["chainId"];
+
+        stdSig = await keplr.signArbitrary(chainId, account.address, JSON.stringify(msgObj));
+      } else if (account.type === AccountType.Basic) {
+        const wallet = await Secp256k1HdWallet.fromMnemonic(account.mnemonic, {
+          prefix: getState().connection.config["addressPrefix"],
+        });
+
+        stdSig = (await wallet.signAmino(account.address, signDoc)).signature;
+      } else {
+        throw new Error("Invalid account type");
+      }
+
+      const document = Buffer.from(serializeSignDoc(signDoc)).toString("base64");
+      const { signature, pub_key: { value: pubkey } } = stdSig;
+      return { document, signature, pubkey };
+    }));
+}
 
 const run = createAsyncThunk(
   "console/run",
@@ -82,40 +120,40 @@ export const execute =
     memo?: string;
     funds?: string;
   } = {}): AppThunk =>
-  (dispatch, getState) => {
-    dispatch(
-      run(async (executeObj) => {
-        const config = getState().connection.config;
-        const contract = selectedContract(getState());
-        const account = selectedAccount(getState());
-        if (!contract) throw new Error("No contract selected");
-        if (!account) throw new Error("No account selected");
+    (dispatch, getState) => {
+      dispatch(
+        run(async (executeObj) => {
+          const config = getState().connection.config;
+          const contract = selectedContract(getState());
+          const account = selectedAccount(getState());
+          if (!contract) throw new Error("No contract selected");
+          if (!account) throw new Error("No account selected");
 
-        const client = await connectionManager.getSigningClient(
-          account,
-          config
-        );
+          const client = await connectionManager.getSigningClient(
+            account,
+            config
+          );
 
-        const executeOptions = getState().console.executeOptions;
-        const executeMemo = memo ?? executeOptions?.memo;
-        const executeFunds = funds ?? executeOptions?.funds;
+          const executeOptions = getState().console.executeOptions;
+          const executeMemo = memo ?? executeOptions?.memo;
+          const executeFunds = funds ?? executeOptions?.funds;
 
-        return client.execute(
-          account.address,
-          contract.address,
-          executeObj,
-          "auto",
-          executeMemo,
-          executeFunds
-            ? coins(
+          return client.execute(
+            account.address,
+            contract.address,
+            executeObj,
+            "auto",
+            executeMemo,
+            executeFunds
+              ? coins(
                 toMicroAmount(executeFunds, config["coinDecimals"]),
                 config["microDenom"]
               )
-            : undefined
-        );
-      })
-    );
-  };
+              : undefined
+          );
+        })
+      );
+    };
 
 export const consoleSlice = createSlice({
   name: "console",

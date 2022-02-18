@@ -5,6 +5,7 @@
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "^0.27.1",
     "@cosmjs/faucet-client": "^0.27.1",
+    "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/proto-signing": "^0.27.1",
     "@reduxjs/toolkit": "^1.7.2",
     "@shoelace-style/shoelace": "^2.0.0-beta.64",
