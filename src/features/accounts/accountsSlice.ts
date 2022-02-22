@@ -221,7 +221,6 @@ export const sendCoins = createAsyncThunk(
       const config = customConfig ?? state.connection.config;
       const senderAccount = state.accounts.accountList[sender];
 
-      console.log(sender, senderAccount);
       if (!sender) {
         throw new Error("No account selected");
       }
@@ -237,6 +236,13 @@ export const sendCoins = createAsyncThunk(
           denom: config["microDenom"],
         },
       ];
+
+      dispatch(
+        pushMessage({
+          status: "neutral",
+          message: "Sending coins...",
+        })
+      );
 
       const { code } = await client.sendTokens(
         sender,
