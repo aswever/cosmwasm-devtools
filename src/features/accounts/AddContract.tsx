@@ -45,6 +45,12 @@ export const ImportContract: FC<ImportContractProps> = ({ open, setOpen }) => {
           Add
         </SlButton>
       </div>
+      <div className={styles.importGroup}>
+        <input className={styles.file} type="file" accept=".wasm" />
+        <SlButton className={styles.importButton} onClick={() => doImport()}>
+          Upload
+        </SlButton>
+      </div>
     </SlDialog>
   );
 };

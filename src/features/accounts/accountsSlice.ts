@@ -153,6 +153,40 @@ export const importContract = createAsyncThunk(
   }
 );
 
+export const uploadContract = createAsyncThunk(
+  "accounts/uploadContract",
+  async (
+    {
+      address,
+      wasm,
+    }: {
+      address: string;
+      wasm: Uint8Array;
+    },
+    { getState, dispatch }
+  ): Promise<void> => {
+    const state = getState() as RootState;
+    const config = state.connection.config;
+    const account = state.accounts.accountList[address];
+    const client = await connectionManager.getSigningClient(account, config);
+
+    try {
+      const uploadResult = client.upload(address, wasm, "auto");
+      console.log(uploadResult);
+    } catch (e) {
+      dispatch(
+        pushMessage({
+          status: "danger",
+          header: "Failed to upload contract",
+          message: e instanceof Error ? e.message : JSON.stringify(e),
+        })
+      );
+
+      throw e;
+    }
+  }
+);
+
 export const checkBalance = createAsyncThunk(
   "accounts/checkBalance",
   async (address: string, { getState }): Promise<Coin> => {
