@@ -139,7 +139,6 @@ export function useKeplr(): {
 
   const connect = useCallback(async (): Promise<void> => {
     try {
-      console.log("here");
       await suggestChain();
       await getAccount();
     } catch (e) {
