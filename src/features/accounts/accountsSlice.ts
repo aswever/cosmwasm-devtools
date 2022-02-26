@@ -44,12 +44,14 @@ export interface AccountsState {
   currentContract?: string;
   sendCoinsOpen: boolean;
   donationOpen: boolean;
+  importContractOpen: boolean;
 }
 
 const initialState: AccountsState = {
   accountList: {},
   sendCoinsOpen: false,
   donationOpen: false,
+  importContractOpen: false,
 };
 
 export const importAccount = createAsyncThunk(
@@ -71,6 +73,7 @@ export const importAccount = createAsyncThunk(
         prefix: config["addressPrefix"],
       });
       const [{ address }] = await wallet.getAccounts();
+
       return {
         label,
         mnemonic,
@@ -131,6 +134,8 @@ export const importContract = createAsyncThunk(
       const contract = await client.getContract(address);
       const { label } = contract;
 
+      dispatch(setImportContractOpen(false));
+
       return {
         type: AccountType.Contract,
         address,
@@ -144,6 +149,119 @@ export const importContract = createAsyncThunk(
         pushMessage({
           status: "danger",
           header: "Failed to add contract",
+          message: e instanceof Error ? e.message : JSON.stringify(e),
+        })
+      );
+
+      throw e;
+    }
+  }
+);
+
+export const uploadContract = createAsyncThunk(
+  "accounts/uploadContract",
+  async (
+    {
+      address,
+      wasm,
+      label,
+      instantiateMsg,
+    }: {
+      address: string;
+      wasm: Uint8Array;
+      label: string;
+      instantiateMsg: Record<string, unknown>;
+    },
+    { getState, dispatch }
+  ): Promise<void> => {
+    const state = getState() as RootState;
+    const config = state.connection.config;
+    const account = state.accounts.accountList[address];
+
+    const client = await connectionManager.getSigningClient(account, config);
+
+    dispatch(
+      pushMessage({
+        status: "neutral",
+        message: "Uploading contract...",
+      })
+    );
+
+    try {
+      const { codeId } = await client.upload(address, wasm, "auto");
+
+      dispatch(
+        pushMessage({
+          status: "success",
+          header: "Contract uploaded successfully",
+          message: `Stored at codeId ${codeId}`,
+        })
+      );
+
+      dispatch(instantiateContract({ address, codeId, label, instantiateMsg }));
+    } catch (e) {
+      dispatch(
+        pushMessage({
+          status: "danger",
+          header: "Failed to upload contract",
+          message: e instanceof Error ? e.message : JSON.stringify(e),
+        })
+      );
+
+      throw e;
+    }
+  }
+);
+export const instantiateContract = createAsyncThunk(
+  "accounts/instantiateContract",
+  async (
+    {
+      address,
+      codeId,
+      label,
+      instantiateMsg,
+    }: {
+      address: string;
+      codeId: number;
+      label: string;
+      instantiateMsg: Record<string, unknown>;
+    },
+    { getState, dispatch }
+  ): Promise<void> => {
+    const state = getState() as RootState;
+    const config = state.connection.config;
+    const account = state.accounts.accountList[address];
+    const client = await connectionManager.getSigningClient(account, config);
+    dispatch(
+      pushMessage({
+        status: "neutral",
+        message: "Instantiating contract...",
+      })
+    );
+
+    try {
+      const { contractAddress } = await client.instantiate(
+        address,
+        codeId,
+        instantiateMsg,
+        label,
+        "auto"
+      );
+
+      dispatch(
+        pushMessage({
+          status: "success",
+          header: "Contract instantiated successfully",
+          message: `Contract address: ${contractAddress}`,
+        })
+      );
+
+      dispatch(importContract(contractAddress));
+    } catch (e) {
+      dispatch(
+        pushMessage({
+          status: "danger",
+          header: "Failed to instantiate contract",
           message: e instanceof Error ? e.message : JSON.stringify(e),
         })
       );
@@ -323,6 +441,9 @@ export const accountsSlice = createSlice({
     setDonationOpen: (state, action: PayloadAction<boolean>) => {
       state.donationOpen = action.payload;
     },
+    setImportContractOpen: (state, action: PayloadAction<boolean>) => {
+      state.importContractOpen = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -371,6 +492,7 @@ export const {
   setAccountBalance,
   setSendCoinsOpen,
   setDonationOpen,
+  setImportContractOpen,
 } = accountsSlice.actions;
 
 export const selectedAccount = (state: RootState) =>
