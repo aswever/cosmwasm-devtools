@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { AccountType, setKeplrAccount } from "../accounts/accountsSlice";
 import { Keplr } from "@keplr-wallet/types";
 import { pushMessage } from "../messages/messagesSlice";
+import { fromMicroDenom } from "../../util/coins";
 
 const CosmosCoinType = 118;
 
@@ -79,17 +80,17 @@ export function useKeplr(): {
   const suggestChain = useCallback(async (): Promise<void> => {
     const keplr = await getKeplr();
 
-    const coin: string = config["coinName"];
+    const coinMinimalDenom: string = config["microDenom"];
     const coinDecimals = Number.parseInt(config["coinDecimals"]);
     const coinGeckoId: string = config["coinGeckoId"];
     const chainId: string = config["chainId"];
     const chainName: string = config["chainName"];
     const rpcEndpoint: string = config["rpcEndpoint"];
     const restEndpoint: string = config["restEndpoint"];
+    const addrPrefix: string = config["addressPrefix"];
     const gasPrice = Number.parseFloat(config["gasPrice"]);
-    const coinDenom = coin?.toUpperCase();
-    const coinMinimalDenom = `u${coin}`;
-
+    const coin = fromMicroDenom(coinMinimalDenom);
+    const coinDenom = coin.toUpperCase();
     await keplr.experimentalSuggestChain({
       chainId,
       chainName,
@@ -99,12 +100,12 @@ export function useKeplr(): {
         coinType: CosmosCoinType,
       },
       bech32Config: {
-        bech32PrefixAccAddr: coin,
-        bech32PrefixAccPub: `${coin}pub`,
-        bech32PrefixValAddr: `${coin}valoper`,
-        bech32PrefixValPub: `${coin}valoperpub`,
-        bech32PrefixConsAddr: `${coin}valcons`,
-        bech32PrefixConsPub: `${coin}valconspub`,
+        bech32PrefixAccAddr: addrPrefix,
+        bech32PrefixAccPub: `${addrPrefix}pub`,
+        bech32PrefixValAddr: `${addrPrefix}valoper`,
+        bech32PrefixValPub: `${addrPrefix}valoperpub`,
+        bech32PrefixConsAddr: `${addrPrefix}valcons`,
+        bech32PrefixConsPub: `${addrPrefix}valconspub`,
       },
       currencies: [
         {
@@ -138,8 +139,9 @@ export function useKeplr(): {
 
   const connect = useCallback(async (): Promise<void> => {
     try {
-      await getAccount();
+      console.log("here");
       await suggestChain();
+      await getAccount();
     } catch (e) {
       dispatch(
         pushMessage({

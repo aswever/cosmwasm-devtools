@@ -25,6 +25,7 @@
 .importGroup {
   display: flex;
   margin-bottom: 0.5rem;
+  margin-top: -1em;
 }
 
 .address {
@@ -50,6 +51,89 @@
 .file {
   border: 1px solid #ccc;
   padding: 0.6em;
+  border-radius: 0 0.3em 0 0;
+  margin-left: -1px;
+  width: 14em;
   flex-grow: 1;
-  border-radius: 0.3em 0 0 0.3em;
+}
+
+.code {
+  flex-grow: 1;
+  margin-left: -1px;
+  width: 4em;
+}
+
+.code::part(:global(base)) {
+  border-radius: 0 0.3em 0 0;
+}
+
+.code input {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}  
+
+.label {
+  flex-grow: 1;
+}
+
+.label::part(:global(base)) {
+  border-radius: 0.3em 0 0 0;
+}
+
+.msgWrapper {
+  min-height: 10em;
+  max-height: 20em;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-top: 0;
+}
+
+.instantiateMsg {
+  min-height: 10em;
+    border: 0;
+}
+
+.instantiateMsg textarea {
+  min-height: 10em;
+  outline: none;
+}
+
+.uploadHeader {
+  margin: 1em 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.uploadTitle {
+  font-size: 1.25rem;
+}
+
+.choices {
+  margin-top: -0.1em;
+  margin-left: 1em;
+}
+
+.choice {
+  display: inline;
+}
+
+.choice::part(:global(base)) {
+  padding:0.4em;
+  font-size: 0.9em;
+}
+
+
+.uploadGroup {
+  display: flex;
+}
+
+.uploadButton {
+  margin-top: 1em;
+  display: flex;
+  flex-direction: row-reverse;
 }
