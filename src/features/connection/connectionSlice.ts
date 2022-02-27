@@ -17,7 +17,7 @@ export interface ConnectionState {
 }
 
 const initialState: ConnectionState = {
-  config: presets["juno-local-test"],
+  config: presets["juno-uni"],
   modalOpen: false,
   status: ConnectionStatus.Connecting,
 };
