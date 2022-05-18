@@ -95,7 +95,7 @@ export const ImportContract: FC = () => {
           placeholder="Address"
           value={address}
           className={styles.address}
-          onSlChange={(e) =>
+          onSlInput={(e) =>
             setAddress((e.target as SlInputElement).value.trim())
           }
         />
@@ -131,7 +131,7 @@ export const ImportContract: FC = () => {
             placeholder="Label"
             value={label}
             className={styles.label}
-            onSlChange={(e) =>
+            onSlInput={(e) =>
               setLabel((e.target as SlInputElement).value.trim())
             }
           />
@@ -149,7 +149,7 @@ export const ImportContract: FC = () => {
               type="number"
               min="1"
               className={styles.code}
-              onSlChange={(e) =>
+              onSlInput={(e) =>
                 setCodeId((e.target as SlInputElement).value.trim())
               }
             />
