@@ -12,7 +12,7 @@
   },
   "juno-uni": {
     "chainName": "Juno Testnet - Uni",
-    "chainId": "uni-2",
+    "chainId": "uni-3",
     "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
     "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
     "addressPrefix": "juno",
