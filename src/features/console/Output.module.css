@@ -1,11 +1,11 @@
 .output {
   height: 100%;
+  padding: 10px 0 10px 10px;
+  background-color: #fafafa;
 }
 
 .output pre {
   margin: 0;
-  padding: 10px;
-  background-color: #fafafa;
   min-height: 100%;
   word-break: break-word;
   white-space: pre-wrap;
@@ -13,4 +13,12 @@
 
 .output.error pre {
   color: firebrick;
+}
+
+:global(.variable-value) {
+  word-break: break-all;
+}
+
+:global(.object-key-val), :global(.variable-row) {
+  padding-right: 0 !important;
 }
