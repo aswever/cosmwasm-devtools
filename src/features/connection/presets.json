@@ -12,9 +12,9 @@
   },
   "juno-uni": {
     "chainName": "Juno Testnet - Uni",
-    "chainId": "uni-3",
-    "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
-    "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
+    "chainId": "uni-5",
+    "rpcEndpoint": "https://rpc.uni.junonetwork.io",
+    "restEndpoint": "https://api.uni.junonetwork.io",
     "addressPrefix": "juno",
     "microDenom": "ujunox",
     "coinDecimals": "6",
