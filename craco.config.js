@@ -1,5 +1,8 @@
 const { ProvidePlugin } = require("webpack");
 module.exports = {
+  devServer: {
+    port: 3001
+  },
   webpack: {
     configure: (webpackConfig) => {
       return {

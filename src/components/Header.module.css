@@ -1,6 +1,14 @@
 .header {
 }
 
+.subtext {
+  font-family: "Courier New", Courier, monospace;
+  text-align: center;
+  font-weight: normal;
+  margin-bottom: 0;
+  font-size: 0.7em;
+}
+
 .name,
 .subhead {
   font-family: "Courier New", Courier, monospace;

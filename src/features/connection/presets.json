@@ -11,10 +11,10 @@
     "gasPrice": "0.025"
   },
   "juno-uni": {
-    "chainName": "Juno Testnet - Uni",
-    "chainId": "uni-3",
-    "rpcEndpoint": "https://rpc.uni.juno.deuslabs.fi",
-    "restEndpoint": "https://lcd.uni.juno.deuslabs.fi",
+    "chainName": "Juno XTREME",
+    "chainId": "uni-6",
+    "rpcEndpoint": "https://juno-testnet-rpc.polkachu.com/",
+    "restEndpoint": "https://juno-testnet-api.polkachu.com/",
     "addressPrefix": "juno",
     "microDenom": "ujunox",
     "coinDecimals": "6",
