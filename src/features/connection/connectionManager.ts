@@ -1,5 +1,4 @@
 import {
-    CosmWasmClient,
     SigningCosmWasmClient,
     setupWasmExtension,
     WasmExtension,
