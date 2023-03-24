@@ -104,10 +104,10 @@ export const query = (): AppThunk => (dispatch, getState) => {
     run(async (queryObj) => {
       const contract = selectedContract(getState());
       if (!contract) throw new Error("No contract selected");
-      const client = await connectionManager.getQueryClient(
+      const conn = await connectionManager.getQueryClient(
         getState().connection.config
       );
-      return client.queryContractSmart(contract.address, queryObj);
+      return conn?.client?.wasm.queryContractSmart(contract.address, queryObj);
     })
   );
 };
