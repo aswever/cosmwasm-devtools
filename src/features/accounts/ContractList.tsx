@@ -10,6 +10,7 @@ import styles from "./ContractList.module.css";
 import { AddContract } from "./AddContract";
 import { AccountCard } from "./AccountCard";
 import { Contract } from "../accounts/accountsSlice";
+import { setForceRefresh } from "../connection/connectionSlice";
 
 interface ContractProps {
     contract: Contract;
@@ -20,11 +21,25 @@ export const ContractDetails: FC<ContractProps> = ({ contract }) => {
     const selected = useAppSelector(
         (state) => state.accounts.currentContract === contract.address
     );
+    const forceRefresh = useAppSelector((state) => state.connection.forceRefresh);
+
     const [lastTimestamp, setLastTimestamp] = useState<Map<string, number>>(
         new Map()
     );
 
+    const [recheckCtr, setRecheckCtr] = useState(0);
+
     const check = useCallback(() => {
+        const updateTimestampMap = (k: string, v: number) => {
+            setLastTimestamp(new Map(lastTimestamp.set(k, v)));
+        };
+
+        if (forceRefresh) {
+            dispatch(setForceRefresh(false))
+            setLastTimestamp(new Map())
+            setRecheckCtr(recheckCtr + 1);
+        }
+
         const addr = contract.address;
         if (addr !== "") {
             const lastTs = lastTimestamp.get(addr);
@@ -38,11 +53,11 @@ export const ContractDetails: FC<ContractProps> = ({ contract }) => {
             updateTimestampMap(addr, Date.now());
             dispatch(checkContract(contract));
         }
-    }, [contract]);
 
-    const updateTimestampMap = (k: string, v: number) => {
-        setLastTimestamp(new Map(lastTimestamp.set(k, v)));
-    };
+        setTimeout(() => {
+            setRecheckCtr(recheckCtr + 1);
+        }, 1000);
+    }, [contract, dispatch, lastTimestamp, recheckCtr, forceRefresh]);
 
     return (
         <AccountCard
@@ -60,7 +75,7 @@ export const ContractDetails: FC<ContractProps> = ({ contract }) => {
 export const ContractList: FC = () => {
     const contracts = useAppSelector(contractAccounts);
     return (
-        <div className={styles.section}>
+        <div className={`${styles.section} py-4`}>
             <div className={styles.header}>Contracts</div>
             {Object.values(contracts).map((contract) => (
                 <ContractDetails key={contract.address} contract={contract} />

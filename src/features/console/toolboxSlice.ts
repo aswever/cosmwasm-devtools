@@ -27,7 +27,7 @@ export interface ExecuteOptions {
     memo: string;
 }
 
-export interface ConsoleState {
+export interface ToolboxState {
     input: string;
     output: string;
     error: boolean;
@@ -35,81 +35,36 @@ export interface ConsoleState {
     executeOptions?: ExecuteOptions;
 }
 
-const initialState: ConsoleState = {
+const initialState: ToolboxState = {
     input: "",
     output: "Response will appear here",
     error: false,
     optionsOpen: false,
 };
 
-class ConsoleError extends Error {}
-
-export const sign = (): AppThunk => (dispatch, getState) => {
-    dispatch(
-        run(async (msgObj) => {
-            const account = selectedAccount(getState());
-            if (!account) throw new Error("No account selected");
-
-            const signDoc = makeADR36AminoSignDoc(
-                account.address,
-                JSON.stringify(msgObj)
-            );
-
-            let stdSig: StdSignature;
-
-            if (account.type === AccountType.Keplr) {
-                const keplr = await getKeplr();
-                const chainId = getState().connection.config["chainId"];
-
-                stdSig = await keplr.signArbitrary(
-                    chainId,
-                    account.address,
-                    JSON.stringify(msgObj)
-                );
-            } else if (account.type === AccountType.Basic) {
-                const wallet = await Secp256k1HdWallet.fromMnemonic(
-                    account.mnemonic,
-                    {
-                        prefix: getState().connection.config["addressPrefix"],
-                    }
-                );
-
-                stdSig = (await wallet.signAmino(account.address, signDoc))
-                    .signature;
-            } else {
-                throw new Error("Invalid account type");
-            }
-
-            const document = Buffer.from(serializeSignDoc(signDoc)).toString(
-                "base64"
-            );
-            const {
-                signature,
-                pub_key: { value: pubkey },
-            } = stdSig;
-            return { document, signature, pubkey };
-        })
-    );
-};
+class ToolboxError extends Error {}
 
 const run = createAsyncThunk(
-    "console/run",
+    "toolbox/run",
     async (
         command: (msgObj: any) => Promise<any>,
         { getState }
     ): Promise<string> => {
         let result = "";
         try {
-            const msgObj = JSON.parse((getState() as RootState).console.input);
+            let msgObj = {};
+            if ((getState() as RootState)?.toolbox?.input.length > 0) {
+                msgObj = JSON.parse((getState() as RootState).toolbox.input);
+            }
             const resObj = await command(msgObj);
             result = JSON.stringify(resObj, null, 2);
         } catch (e) {
             if (e instanceof SyntaxError) {
-                throw new ConsoleError(`Invalid JSON: ${e.message}`);
+                throw new ToolboxError(`Invalid JSON: ${e.message}`);
             } else if (e instanceof Error) {
-                throw new ConsoleError(`Error: ${e.message}`);
+                throw new ToolboxError(`Error: ${e.message}`);
             } else {
-                throw new ConsoleError(`Unknown error: ${e}`);
+                throw new ToolboxError(`Unknown error: ${e}`);
             }
         }
 
@@ -117,9 +72,12 @@ const run = createAsyncThunk(
     }
 );
 
-export const query = (): AppThunk => (dispatch, getState) => {
+export const buildQueryToolbox = (): AppThunk => (dispatch, getState) => {
     dispatch(
-        run(async (queryObj) => {
+        run(async () => {
+            const queryObj = {
+                intentionally_poWHSIKEYor_query: "",
+            };
             const contract = selectedContract(getState());
             if (!contract) throw new Error("No contract selected");
             const conn = await connectionManager.getQueryClient(
@@ -155,7 +113,7 @@ export const execute =
                     config
                 );
 
-                const executeOptions = getState().console.executeOptions;
+                const executeOptions = getState().toolbox.executeOptions;
                 const executeMemo = memo ?? executeOptions?.memo;
                 const executeFunds = funds ?? executeOptions?.funds;
 
@@ -179,8 +137,8 @@ export const execute =
         );
     };
 
-export const consoleSlice = createSlice({
-    name: "console",
+export const toolboxSlice = createSlice({
+    name: "toolbox",
     initialState,
     reducers: {
         setInput: (state, action: PayloadAction<string>) => {
@@ -191,24 +149,6 @@ export const consoleSlice = createSlice({
         },
         setExecuteOptions: (state, action: PayloadAction<ExecuteOptions>) => {
             state.executeOptions = action.payload;
-        },
-        prettifyInput: (state, action: PayloadAction<string>) => {
-            try {
-                state.input = JSON.stringify(
-                    JSON.parse(action.payload),
-                    null,
-                    2
-                );
-            } catch (e) {
-                if (e instanceof SyntaxError) {
-                    state.output = `Invalid JSON: ${e.message}`;
-                } else if (e instanceof Error) {
-                    state.output = `Error: ${e.message}`;
-                }
-            }
-        },
-        setOptionsOpen: (state, action: PayloadAction<boolean>) => {
-            state.optionsOpen = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -221,18 +161,33 @@ export const consoleSlice = createSlice({
                 state.error = false;
             })
             .addCase(run.rejected, (state, action) => {
+                console.log(`action.error.message`);
+                console.log(JSON.stringify(action.error));
+                if (
+                    action.error.message?.includes(
+                        "intentionally_poWHSIKEYor_query"
+                    )
+                ) {
+                    let regExp = new RegExp(
+                        "^(.*?)\\s(expected one of)\\s(.*?)(\\: query wasm)(.*?)$",
+                        "g"
+                    );
+
+                    let match = regExp.exec(action.error.message)
+
+                    console.log(action)
+
+                    if (match && match.length === 6) {
+                        let queryMsgCommands = match[3].replaceAll('`', '');
+                        console.log(queryMsgCommands)
+                    }
+                }
                 state.output = action.error.message ?? "Error";
                 state.error = true;
             });
     },
 });
 
-export const {
-    setInput,
-    setOutput,
-    prettifyInput,
-    setOptionsOpen,
-    setExecuteOptions,
-} = consoleSlice.actions;
+export const { setInput, setOutput, setExecuteOptions } = toolboxSlice.actions;
 
-export default consoleSlice.reducer;
+export default toolboxSlice.reducer;

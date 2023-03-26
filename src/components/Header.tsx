@@ -10,28 +10,31 @@ import styles from "./Header.module.css";
 const GITHUB_URL = "https://github.com/aswever/cosmwasm-devtools";
 
 export const Header = () => {
-  const dispatch = useAppDispatch();
-  return (
-    <div className={styles.header}>
-      <h3 className={styles.name}>cøsmwasm devtøøls <br/><span className={styles.subtext}>(credits to aswever)</span></h3>
-      
-      <div className={styles.subhead}>
-        <a
-          className={styles.link}
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noreferrer"
-        >
-          github
-        </a>{" "}
-        |{" "}
-        <button
-          className={styles.link}
-          onClick={() => dispatch(setDonationOpen(true))}
-        >
-          donate
-        </button>
-      </div>
-    </div>
-  );
+    const dispatch = useAppDispatch();
+    return (
+        <div className={`${styles.header} border border-bottom`}>
+            <h3 className={styles.name}>
+                cøsmwasm devtøøls <br />
+                <span className={styles.subtext}>(credits to aswever)</span>
+            </h3>
+
+            <div className={styles.subhead}>
+                <a
+                    className={styles.link}
+                    href={GITHUB_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    github
+                </a>{" "}
+                |{" "}
+                <button
+                    className={styles.link}
+                    onClick={() => dispatch(setDonationOpen(true))}
+                >
+                    donate
+                </button>
+            </div>
+        </div>
+    );
 };

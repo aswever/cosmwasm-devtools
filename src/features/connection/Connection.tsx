@@ -21,7 +21,7 @@ export const Connection: FC = () => {
   const classes = [styles.connection, styles[`state-${connection}`]].join(" ");
 
   return (
-    <SlCard className={classes}>
+    <SlCard className={`${classes} h-[42px] mt-auto`}>
       <SlIcon
         name={
           connection === ConnectionStatus.Connected

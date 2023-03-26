@@ -50,7 +50,8 @@ sl-divider {
 .sidebar-main {
   display: flex;
   flex-direction: column;
-  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
   flex-grow: 1;
 }
 
@@ -69,3 +70,7 @@ sl-divider {
   overflow-x: hidden;
   z-index: 0;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

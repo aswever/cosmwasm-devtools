@@ -35,7 +35,8 @@
     "start": "GENERATE_SOURCEMAP=false craco start",
     "build": "craco build",
     "test": "craco test",
-    "eject": "craco eject"
+    "eject": "craco eject",
+    "tailwind": "npx tailwindcss -i ./src/App.css -o ./dist/output.css --watch"
   },
   "eslintConfig": {
     "extends": "react-app"

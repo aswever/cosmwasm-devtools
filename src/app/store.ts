@@ -10,6 +10,7 @@ import accountsReducer from "../features/accounts/accountsSlice";
 import connectionReducer from "../features/connection/connectionSlice";
 import messagesReducer from "../features/messages/messagesSlice";
 import consoleReducer from "../features/console/consoleSlice";
+import toolboxReducer from "../features/console/toolboxSlice";
 
 const persistConfig = {
   key: "root",
@@ -23,6 +24,7 @@ const reducer = persistReducer(
     connection: connectionReducer,
     messages: messagesReducer,
     console: consoleReducer,
+    toolbox: toolboxReducer,
   })
 );
 

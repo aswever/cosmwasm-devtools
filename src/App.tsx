@@ -21,13 +21,11 @@ function App() {
     <div className="main">
       <aside className="sidebar">
         <Header />
-        <SlDivider />
-        <div className="sidebar-main">
+        <div className="sidebar-main pt-4">
           <AccountList />
-          <SlDivider />
           <ContractList />
         </div>
-        <div className="connection">
+        <div className="connection border border-top pt-2">
           <Connection />
         </div>
       </aside>

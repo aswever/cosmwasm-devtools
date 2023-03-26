@@ -1,5 +1,4 @@
 .section {
-  margin: 1rem 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,6 +6,4 @@
 
 .header {
   font-weight: bold;
-  margin: 0.5rem;
-  margin-left: 1rem;
 }
