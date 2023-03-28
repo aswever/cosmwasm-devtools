@@ -1,5 +1,5 @@
 import { SlSplitPanel } from "@shoelace-style/shoelace/dist/react";
-import React, { FC } from "react";
+import { FC } from "react";
 import styles from "./Console.module.css";
 import { Output } from "./Output";
 import { Input } from "./Input";

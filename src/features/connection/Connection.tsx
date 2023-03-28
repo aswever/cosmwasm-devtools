@@ -1,5 +1,5 @@
 import { SlCard, SlIcon } from "@shoelace-style/shoelace/dist/react";
-import React, { FC, useEffect } from "react";
+import { FC, useEffect } from "react";
 import styles from "./Connection.module.css";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {

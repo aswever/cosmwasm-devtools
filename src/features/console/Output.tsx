@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from "react";
+import { FC, useMemo } from "react";
 import { useAppSelector } from "../../app/hooks";
 import styles from "./Output.module.css";
 import ReactJson from "react-json-view";

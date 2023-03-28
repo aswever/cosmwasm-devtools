@@ -5,9 +5,8 @@ import {
     SlMenu,
     SlMenuItem,
 } from "@shoelace-style/shoelace/dist/react";
-import React, {
+import {
     FC,
-    useCallback,
     useEffect,
     useLayoutEffect,
     useRef,
@@ -234,8 +233,6 @@ export const Input: FC = () => {
             let eCards: IDropdownOption[] = [];
 
             let keys = Object.keys(toolboxExecuteOptions).sort();
-
-            console.log(toolboxExecuteOptions);
 
             for (const key of keys) {
                 eCards.push({ name: key, code: key } as IDropdownOption);

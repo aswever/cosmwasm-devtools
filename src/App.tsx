@@ -1,11 +1,9 @@
-import React from "react";
 import "./App.css";
 import { AccountList } from "./features/accounts/AccountList";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path";
 import { ContractList } from "./features/accounts/ContractList";
 import { Console } from "./features/console/Console";
-import { SlDivider } from "@shoelace-style/shoelace/dist/react";
 import { Connection } from "./features/connection/Connection";
 import { Configuration } from "./features/connection/Configuration";
 import { Messages } from "./features/messages/Messages";

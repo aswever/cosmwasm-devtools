@@ -6,7 +6,7 @@ import {
 } from "@shoelace-style/shoelace/dist/react";
 import type SlInputElement from "@shoelace-style/shoelace/dist/components/input/input";
 import type SlSwitchElement from "@shoelace-style/shoelace/dist/components/switch/switch";
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import styles from "./ExecuteOptions.module.css";
 import { execute, setExecuteOptions, setOptionsOpen } from "./consoleSlice";
