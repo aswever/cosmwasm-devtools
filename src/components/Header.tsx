@@ -7,9 +7,8 @@ const GITHUB_URL = "https://github.com/aswever/cosmwasm-devtools";
 export const Header = () => {
     const dispatch = useAppDispatch();
     return (
-        <div className={`${styles.header} border border-bottom`}>
-            <h3 className={styles.name}>cøsmwasm devtøøls</h3>
-
+        <div className={`${styles.header} border border-bottom py-2`}>
+            <span className={`${styles.name} text-lg w-full text-center m-auto block`}>cøsmwasm devtøøls</span>
             <div className={styles.subhead}>
                 <a
                     className={styles.link}

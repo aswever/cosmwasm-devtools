@@ -5,13 +5,7 @@ import {
     SlMenu,
     SlMenuItem,
 } from "@shoelace-style/shoelace/dist/react";
-import {
-    FC,
-    useEffect,
-    useLayoutEffect,
-    useRef,
-    useState,
-} from "react";
+import { FC, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Editor from "react-simple-code-editor";
 import formatHighlight from "json-format-highlight";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -23,6 +17,7 @@ import {
     highlightColors,
     setOptionsOpen,
     sign,
+    setInstantiateOpen,
 } from "./consoleSlice";
 
 import {
@@ -61,6 +56,9 @@ export const Input: FC = () => {
     // used when a user switches contracts. will requery the selected contract
     const selected = useAppSelector((state) => state.accounts.currentContract);
     const stateReset = useAppSelector((state) => state.toolbox.stateReset);
+    const forceRefresh = useAppSelector(
+        (state) => state.connection.forceRefresh
+    );
 
     // query processing handlers
     // refs so we dont get in a rerender loop
@@ -132,19 +130,39 @@ export const Input: FC = () => {
 
             setLastContractSelected(selected);
             dispatch(resetState());
+            rebuildToolbox();
         }
     }, [dispatch, lastContractSelected, selected]);
 
     // if stateReset is detected, we'll rebuild the toolbox
     useEffect(() => {
         if (stateReset) {
-            queryReady.current = true;
-            dispatch(buildQueryToolbox());
-
-            executeReady.current = true;
-            dispatch(buildExecuteToolbox());
+            dispatch(resetState());
+            rebuildToolbox();
         }
     }, [stateReset]);
+
+    useEffect(() => {
+        if (forceRefresh) {
+            dispatch(resetState());
+            setQueryCards([]);
+            setExecuteCards([]);
+            if (selected) {
+                console.log("forceRefresh");
+                rebuildToolbox();
+            }
+        }
+    }, [forceRefresh, selected]);
+
+    const rebuildToolbox = () => {
+        setQueryCards([]);
+        setExecuteCards([]);
+        queryReady.current = true;
+        dispatch(buildQueryToolbox());
+
+        executeReady.current = true;
+        dispatch(buildExecuteToolbox());
+    };
 
     // this hook will iterate through the available options and then populate parameters
     useEffect(() => {
@@ -344,6 +362,7 @@ export const Input: FC = () => {
                     value={message}
                     padding={10}
                     onValueChange={(code) => editorValueChange(code)}
+                    //onValueChange={(code) => setMessage(code)}
                 />
             </div>
             <div className={`${styles.controls} flex-none`}>
@@ -379,6 +398,16 @@ export const Input: FC = () => {
                     <SlDropdown>
                         <SlButton slot="trigger" caret></SlButton>
                         <SlMenu>
+                            <SlMenuItem
+                                onClick={() => {
+                                    if (currentAccount !== undefined) {
+                                        dispatch(setInstantiateOpen(true));
+                                    }
+                                }}
+                                disabled={currentAccount === undefined}
+                            >
+                                Instantiate
+                            </SlMenuItem>
                             <SlMenuItem
                                 onClick={() => {
                                     if (currentAccount !== undefined) {

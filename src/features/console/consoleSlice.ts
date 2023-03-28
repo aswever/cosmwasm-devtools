@@ -27,19 +27,32 @@ export interface ExecuteOptions {
     memo: string;
 }
 
+export interface InstantiateOptions {
+    codeId: string;
+    label: string;
+    funds?: string;
+    memo?: string;
+    admin?: string;
+}
+
 export interface ConsoleState {
     input: string;
     output: string;
+    errorOutput: string;
     error: boolean;
     optionsOpen: boolean;
+    instantiateOpen: boolean;
     executeOptions?: ExecuteOptions;
+    instantiateOptions?: InstantiateOptions;
 }
 
 const initialState: ConsoleState = {
     input: "",
     output: "Response will appear here",
+    errorOutput: "",
     error: false,
     optionsOpen: false,
+    instantiateOpen: false,
 };
 
 class ConsoleError extends Error {}
@@ -189,10 +202,21 @@ export const consoleSlice = createSlice({
         setOutput: (state, action: PayloadAction<string>) => {
             state.output = action.payload;
         },
+        setErrorOutput: (state, action: PayloadAction<string>) => {
+            state.errorOutput = action.payload;
+        },
         setExecuteOptions: (state, action: PayloadAction<ExecuteOptions>) => {
             state.executeOptions = action.payload;
         },
+        setInstantiateOptions: (
+            state,
+            action: PayloadAction<InstantiateOptions | undefined>
+        ) => {
+            state.instantiateOptions = action.payload;
+        },
         prettifyInput: (state, action: PayloadAction<string>) => {
+            state.errorOutput = "";
+
             try {
                 state.input = JSON.stringify(
                     JSON.parse(action.payload),
@@ -201,14 +225,17 @@ export const consoleSlice = createSlice({
                 );
             } catch (e) {
                 if (e instanceof SyntaxError) {
-                    state.output = `Invalid JSON: ${e.message}`;
+                    state.errorOutput = `Invalid JSON: ${e.message}`;
                 } else if (e instanceof Error) {
-                    state.output = `Error: ${e.message}`;
+                    state.errorOutput = `Error: ${e.message}`;
                 }
             }
         },
         setOptionsOpen: (state, action: PayloadAction<boolean>) => {
             state.optionsOpen = action.payload;
+        },
+        setInstantiateOpen: (state, action: PayloadAction<boolean>) => {
+            state.instantiateOpen = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -230,9 +257,12 @@ export const consoleSlice = createSlice({
 export const {
     setInput,
     setOutput,
+    setErrorOutput,
     prettifyInput,
     setOptionsOpen,
+    setInstantiateOpen,
     setExecuteOptions,
+    setInstantiateOptions,
 } = consoleSlice.actions;
 
 export default consoleSlice.reducer;

@@ -1,11 +1,17 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { coin, Coin, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
+import {
+    coin,
+    Coin,
+    coins,
+    DirectSecp256k1HdWallet,
+} from "@cosmjs/proto-signing";
 import { RootState } from "../../app/store";
 import { Contract as CosmWasmContract } from "@cosmjs/cosmwasm-stargate";
 import { fromMicroCoin, toMicroAmount } from "../../util/coins";
 import { pushMessage } from "../messages/messagesSlice";
 import { FaucetClient } from "@cosmjs/faucet-client";
 import connectionManager from "../connection/connectionManager";
+import { setInstantiateOptions } from "../console/consoleSlice";
 
 export enum AccountType {
     Basic,
@@ -182,7 +188,7 @@ export const uploadContract = createAsyncThunk(
             address: string;
             wasm: Uint8Array;
             label: string;
-            instantiateMsg: Record<string, unknown>;
+            instantiateMsg?: Record<string, unknown>;
         },
         { getState, dispatch }
     ): Promise<void> => {
@@ -229,6 +235,13 @@ export const uploadContract = createAsyncThunk(
         }
     }
 );
+
+interface IInstantiateOptions {
+    memo?: string;
+    funds?: Coin[];
+    admin?: string;
+}
+
 export const instantiateContract = createAsyncThunk(
     "accounts/instantiateContract",
     async (
@@ -237,11 +250,17 @@ export const instantiateContract = createAsyncThunk(
             codeId,
             label,
             instantiateMsg,
+            memo,
+            funds,
+            admin,
         }: {
             address: string;
             codeId: number;
             label: string;
-            instantiateMsg: Record<string, unknown>;
+            instantiateMsg?: Record<string, unknown>;
+            memo?: string;
+            funds?: string;
+            admin?: string;
         },
         { getState, dispatch }
     ): Promise<void> => {
@@ -260,12 +279,29 @@ export const instantiateContract = createAsyncThunk(
         );
 
         try {
+            instantiateMsg = JSON.parse(state.console.input);
+            // memo? funds? admin?
+            let options: IInstantiateOptions | undefined = undefined;
+
+            if (memo || funds || admin) {
+                options = {} as IInstantiateOptions;
+                options.memo = memo;
+                options.funds = funds
+                    ? coins(
+                          toMicroAmount(funds, config["coinDecimals"]),
+                          config["microDenom"]
+                      )
+                    : undefined;
+                options.admin = admin;
+            }
+
             const { contractAddress } = await client.instantiate(
                 address,
                 codeId,
                 instantiateMsg,
                 label,
-                "auto"
+                "auto",
+                options
             );
 
             dispatch(
@@ -275,6 +311,8 @@ export const instantiateContract = createAsyncThunk(
                     message: `Contract address: ${contractAddress}`,
                 })
             );
+
+            dispatch(setInstantiateOptions(undefined));
 
             dispatch(importContract(contractAddress));
         } catch (e) {

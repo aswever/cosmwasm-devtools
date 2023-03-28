@@ -10,32 +10,34 @@ import { Messages } from "./features/messages/Messages";
 import { ExecuteOptions } from "./features/console/ExecuteOptions";
 import { Header } from "./components/Header";
 import { Donate } from "./features/accounts/Donate";
+import { InstantiateOptions } from "./features/console/InstantiateOptions";
 
 setBasePath(
-  "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.64/dist/"
+    "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.64/dist/"
 );
 function App() {
-  return (
-    <div className="main">
-      <aside className="sidebar">
-        <Header />
-        <div className="sidebar-main pt-4">
-          <AccountList />
-          <ContractList />
+    return (
+        <div className="main">
+            <aside className="sidebar">
+                <Header />
+                <div className="sidebar-main pt-4">
+                    <AccountList />
+                    <ContractList />
+                </div>
+                <div className="connection border border-top pt-2">
+                    <Connection />
+                </div>
+            </aside>
+            <section className="console">
+                <Console />
+            </section>
+            <Configuration />
+            <Messages />
+            <ExecuteOptions />
+            <InstantiateOptions />
+            <Donate />
         </div>
-        <div className="connection border border-top pt-2">
-          <Connection />
-        </div>
-      </aside>
-      <section className="console">
-        <Console />
-      </section>
-      <Configuration />
-      <Messages />
-      <ExecuteOptions />
-      <Donate />
-    </div>
-  );
+    );
 }
 
 export default App;

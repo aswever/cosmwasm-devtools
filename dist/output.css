@@ -539,6 +539,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   --tw-backdrop-sepia:  ;
 }
 
+.fixed {
+  position: fixed;
+}
+
 .relative {
   position: relative;
 }
@@ -610,6 +614,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 2em;
 }
 
+.w-5\/6 {
+  width: 83.333333%;
+}
+
+.w-2\/3 {
+  width: 66.666667%;
+}
+
 .flex-none {
   flex: none;
 }
@@ -630,12 +642,24 @@ Ensure the default browser behavior of the `hidden` attribute.
   gap: 1rem;
 }
 
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
 .border {
   border-width: 1px;
 }
 
 .p-\[10px\] {
   padding: 10px;
+}
+
+.p-4 {
+  padding: 1rem;
 }
 
 .py-4 {
@@ -651,6 +675,16 @@ Ensure the default browser behavior of the `hidden` attribute.
 .py-\[10px\] {
   padding-top: 10px;
   padding-bottom: 10px;
+}
+
+.py-16 {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .pt-4 {
@@ -675,6 +709,18 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .pl-\[5px\] {
   padding-left: 5px;
+}
+
+.pb-4 {
+  padding-bottom: 1rem;
+}
+
+.pb-2 {
+  padding-bottom: 0.5rem;
+}
+
+.text-center {
+  text-align: center;
 }
 
 .text-right {
