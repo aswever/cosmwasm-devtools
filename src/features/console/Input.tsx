@@ -5,7 +5,14 @@ import {
     SlMenu,
     SlMenuItem,
 } from "@shoelace-style/shoelace/dist/react";
-import React, { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+    FC,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react";
 import Editor from "react-simple-code-editor";
 import formatHighlight from "json-format-highlight";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -228,7 +235,7 @@ export const Input: FC = () => {
 
             let keys = Object.keys(toolboxExecuteOptions).sort();
 
-            console.log(toolboxExecuteOptions)
+            console.log(toolboxExecuteOptions);
 
             for (const key of keys) {
                 eCards.push({ name: key, code: key } as IDropdownOption);
@@ -257,6 +264,12 @@ export const Input: FC = () => {
         if (options !== undefined) {
             let newInput = `{"${opt.name}": ${JSON.stringify(options)}}`;
             dispatch(prettifyInput(newInput));
+            try {
+                // just in case this fails, just let it error into void
+                editorValueChange(
+                    JSON.stringify(JSON.parse(newInput), null, 2)
+                );
+            } catch (e) {}
         }
     };
 
@@ -271,8 +284,11 @@ export const Input: FC = () => {
 
         while (i < count) {
             _lineNumbers.push(
-                <div key={i + 1}>
-                    <span className="text-slate-500">
+                <div key={i + 1} className="w-full">
+                    <span
+                        style={{ width: "80%" }}
+                        className="text-slate-500 block mx-auto text-right"
+                    >
                         {i}
                     </span>
                 </div>
@@ -284,11 +300,11 @@ export const Input: FC = () => {
     };
 
     useLayoutEffect(() => {
-        editorValueChange(message)
-    }, [])
+        editorValueChange(message);
+    }, []);
 
     return (
-        <div className={`${styles.input} flex flex-col`}>
+        <div className={`${styles.input} h-max flex flex-col`}>
             <div
                 style={{
                     borderBottom: "solid",
@@ -320,8 +336,8 @@ export const Input: FC = () => {
                     />
                 </div>
             </div>
-            <div className="grow h-full flex flex-row">
-                <div className="h-full w-[2em] py-[10px] pl-[5px]">
+            <div className="grow h-max flex flex-row">
+                <div className="h-max w-[2em] py-[10px]">
                     <span>{lineNumbers}</span>
                 </div>
                 <Editor

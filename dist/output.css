@@ -539,6 +539,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   --tw-backdrop-sepia:  ;
 }
 
+.relative {
+  position: relative;
+}
+
 .m-auto {
   margin: auto;
 }
@@ -561,6 +565,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-bottom: 2rem;
 }
 
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
 .flex {
   display: flex;
 }
@@ -575,6 +587,11 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .h-\[42px\] {
   height: 42px;
+}
+
+.h-max {
+  height: -webkit-max-content;
+  height: max-content;
 }
 
 .w-full {
@@ -658,6 +675,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .pl-\[5px\] {
   padding-left: 5px;
+}
+
+.text-right {
+  text-align: right;
 }
 
 .text-lg {
