@@ -32,11 +32,18 @@ export interface ToolboxState {
     };
     toolboxQueryProcessing: boolean;
     toolboxQueryReady: boolean;
-    toolboxQueryCtr: number;
+    toolboxExecuteOptions: {
+        [key: string]: {
+            [key: string]: {};
+        };
+    };
+    toolboxExecuteProcessing: boolean;
+    toolboxExecuteReady: boolean;
     stateReset: boolean;
 }
 
-const MASTER_KEY: string = "D7DFB68ED7C1BA3C1BA5184251C52";
+const QUERY_MASTER_KEY: string = "D7DFB68ED7C1BA3C1BA5184251C52";
+const EXECUTE_MASTER_KEY: string = "88B3A2ABFB8DFFB589B39C1FD4BF5";
 
 const initialState: ToolboxState = {
     input: "",
@@ -46,8 +53,10 @@ const initialState: ToolboxState = {
     toolboxQueryOptions: {},
     toolboxQueryProcessing: false,
     toolboxQueryReady: false,
-    toolboxQueryCtr: 0,
-    stateReset: false
+    toolboxExecuteOptions: {},
+    toolboxExecuteProcessing: false,
+    toolboxExecuteReady: false,
+    stateReset: false,
 };
 
 class ToolboxError extends Error {}
@@ -87,7 +96,7 @@ export const buildQueryToolbox = (): AppThunk => (dispatch, getState) => {
             dispatch(setToolboxQueryReady(false));
 
             let queryObj: { [key: string]: {} } = {};
-            queryObj[MASTER_KEY] = {};
+            queryObj[QUERY_MASTER_KEY] = {};
             const contract = selectedContract(getState());
             if (!contract) throw new Error("No contract selected");
             const conn = await connectionManager.getQueryClient(
@@ -101,110 +110,101 @@ export const buildQueryToolbox = (): AppThunk => (dispatch, getState) => {
     );
 };
 
-interface IRunQuery {
+interface IRunCmd {
     cmd: string;
-    isLastQuery: boolean;
+    isLastCmd: boolean;
 }
 
 const runQuery = createAsyncThunk(
     "toolbox/runQuery",
-    async (command: (msgObj: any) => Promise<any>, { getState, dispatch }) =>
-        //): Promise<string> => {
-        {
-            let result = "";
-            try {
-                let msgObj = {};
+    async (command: (msgObj: any) => Promise<any>, { getState, dispatch }) => {
+        try {
+            let msgObj = {};
 
-                const resObj = await command(msgObj);
-                let iRunQuery = resObj() as IRunQuery;
+            const resObj = await command(msgObj);
+            let iRunCmd = resObj() as IRunCmd;
 
-                let _state = getState() as RootState;
+            let _state = getState() as RootState;
 
-                let queryObj: {
-                    [key: string]: {
-                        [key: string]: {};
-                    };
-                } = {};
+            let queryObj: {
+                [key: string]: {
+                    [key: string]: {};
+                };
+            } = {};
 
-                queryObj[iRunQuery.cmd] = {};
-                queryObj[iRunQuery.cmd][MASTER_KEY] = {};
+            queryObj[iRunCmd.cmd] = {};
+            queryObj[iRunCmd.cmd][QUERY_MASTER_KEY] = {};
 
-                const contract = selectedContract(_state);
+            const contract = selectedContract(_state);
 
-                if (!contract) throw new Error("No contract selected");
+            if (!contract) throw new Error("No contract selected");
 
-                const conn = await connectionManager.getQueryClient(
-                    _state.connection.config
+            const conn = await connectionManager.getQueryClient(
+                _state.connection.config
+            );
+
+            const func = new Promise<any>((resolve, reject) => {
+                resolve(
+                    conn?.client?.wasm.queryContractSmart(
+                        contract.address,
+                        queryObj
+                    )
                 );
+            });
 
-                const func = new Promise<any>((resolve, reject) => {
-                    resolve(
-                        conn?.client?.wasm.queryContractSmart(
-                            contract.address,
-                            queryObj
-                        )
-                    );
-                });
+            await func
+                .then((res) => {
+                    return res;
+                })
+                .catch((e2) => {
+                    if ("message" in e2) {
+                        let regExp = /`(.*?)`/g;
+                        let match = [...e2.message.matchAll(regExp)];
 
-                let resObj2: any = await func
-                    .then((res) => {
-                        return res;
-                    })
-                    .catch((e2) => {
-                        if ("message" in e2) {
-                            let regExp = /`(.*?)`/g;
-                            let match = [...e2.message.matchAll(regExp)];
+                        let toolboxOptions: IToolboxOptions = {
+                            key: iRunCmd.cmd,
+                            options: {},
+                        };
 
-                            let toolboxOptions: IToolboxOptions = {
-                                key: iRunQuery.cmd,
-                                options: {},
-                            };
-
-                            if (match && match.length > 0) {
-                                match.forEach((cmd) => {
-                                    if (
-                                        cmd &&
-                                        cmd.length > 0 &&
-                                        cmd[1] &&
-                                        cmd[1] !== MASTER_KEY
-                                    ) {
-                                        toolboxOptions.options[cmd[1]] = "";
-                                    }
-                                });
-                            }
-
-                            dispatch(setToolboxQueryOptions(toolboxOptions));
-
-                            dispatch(setToolboxQueryCtr());
-
-                            if (iRunQuery.isLastQuery) {
-                                dispatch(setToolboxQueryReady(true));
-                            }
+                        if (match && match.length > 0) {
+                            match.forEach((cmd) => {
+                                if (
+                                    cmd &&
+                                    cmd.length > 0 &&
+                                    cmd[1] &&
+                                    cmd[1] !== QUERY_MASTER_KEY
+                                ) {
+                                    toolboxOptions.options[cmd[1]] = "";
+                                }
+                            });
                         }
-                    });
 
-                //result = JSON.stringify(resObj2, null, 2);
-            } catch (e) {}
+                        dispatch(setToolboxQueryOptions(toolboxOptions));
 
-            //return result;
-        }
+                        if (iRunCmd.isLastCmd) {
+                            dispatch(setToolboxQueryReady(true));
+                        }
+                    }
+                });
+        } catch (e) {}
+    }
 );
 
 export const toolboxQuery =
-    (cmd: string, isLastQuery: boolean): AppThunk =>
+    (cmd: string, isLastCmd: boolean): AppThunk =>
     (dispatch, _) => {
         dispatch(
             runQuery(async () => {
                 dispatch(setToolboxQueryReady(false));
 
                 return () => {
-                    return { cmd, isLastQuery };
+                    return { cmd, isLastCmd };
                 };
             })
         );
     };
 
-export const execute =
+export const buildExecuteToolbox =
     ({
         memo,
         funds,
@@ -214,7 +214,12 @@ export const execute =
     } = {}): AppThunk =>
     (dispatch, getState) => {
         dispatch(
-            run(async (executeObj) => {
+            run(async () => {
+                dispatch(setToolboxExecuteProcessing(false));
+                dispatch(setToolboxExecuteReady(false));
+                let executeObj: { [key: string]: {} } = {};
+                executeObj[EXECUTE_MASTER_KEY] = {};
+
                 const config = getState().connection.config;
                 const contract = selectedContract(getState());
                 const account = selectedAccount(getState());
@@ -246,6 +251,102 @@ export const execute =
                           )
                         : undefined
                 );
+            })
+        );
+    };
+
+const runExecute = createAsyncThunk(
+    "toolbox/runExecute",
+    async (command: (msgObj: any) => Promise<any>, { getState, dispatch }) => {
+        try {
+            let msgObj = {};
+
+            const resObj = await command(msgObj);
+            let iRunCmd = resObj() as IRunCmd;
+
+            let _state = getState() as RootState;
+
+            let executeObj: {
+                [key: string]: {
+                    [key: string]: {};
+                };
+            } = {};
+
+            executeObj[iRunCmd.cmd] = {};
+            executeObj[iRunCmd.cmd][EXECUTE_MASTER_KEY] = {};
+
+            const config = _state.connection.config;
+            const contract = selectedContract(_state);
+            const account = selectedAccount(_state);
+            if (!contract) throw new Error("No contract selected");
+            if (!account) throw new Error("No account selected");
+
+            const client = await connectionManager.getSigningClient(
+                account,
+                config
+            );
+
+            const func = new Promise<any>((resolve, reject) => {
+                resolve(
+                    client.execute(
+                        account.address,
+                        contract.address,
+                        executeObj,
+                        "auto",
+                        undefined,
+                        undefined
+                    )
+                );
+            });
+
+            await func
+                .then((res) => {
+                    return res;
+                })
+                .catch((e2) => {
+                    if ("message" in e2) {
+                        let regExp = /`(.*?)`/g;
+                        let match = [...e2.message.matchAll(regExp)];
+
+                        let toolboxOptions: IToolboxOptions = {
+                            key: iRunCmd.cmd,
+                            options: {},
+                        };
+
+                        if (match && match.length > 0) {
+                            match.forEach((cmd) => {
+                                if (
+                                    cmd &&
+                                    cmd.length > 0 &&
+                                    cmd[1] &&
+                                    cmd[1] !== EXECUTE_MASTER_KEY
+                                ) {
+                                    toolboxOptions.options[cmd[1]] = "";
+                                }
+                            });
+                        }
+
+                        dispatch(setToolboxExecuteOptions(toolboxOptions));
+
+                        if (iRunCmd.isLastCmd) {
+                            dispatch(setToolboxExecuteReady(true));
+                        }
+                    }
+                });
+        } catch (e) {}
+    }
+);
+
+export const toolboxExecute =
+    (cmd: string, isLastCmd: boolean): AppThunk =>
+    (dispatch, _) => {
+        dispatch(
+            runExecute(async () => {
+                dispatch(setToolboxExecuteReady(false));
+
+                return () => {
+                    return { cmd, isLastCmd };
+                };
             })
         );
     };
@@ -293,14 +394,39 @@ export const toolboxSlice = createSlice({
                 state.toolboxQueryOptions = newObj;
             }
         },
-        setToolboxQueryCtr: (state) => {
-            state.toolboxQueryCtr++;
+        setToolboxExecuteProcessing: (
+            state,
+            action: PayloadAction<boolean>
+        ) => {
+            state.toolboxExecuteProcessing = action.payload;
+        },
+        setToolboxExecuteReady: (state, action: PayloadAction<boolean>) => {
+            state.toolboxExecuteReady = action.payload;
+        },
+        setToolboxExecuteOptions: (
+            state,
+            action: PayloadAction<IToolboxOptions>
+        ) => {
+            if (action.payload) {
+                let newObj = { ...state.toolboxExecuteOptions };
+                let newSubObj = Object.assign(
+                    {},
+                    state.toolboxExecuteOptions[action.payload.key] ?? {},
+                    action.payload.options ?? {}
+                );
+
+                newObj[action.payload.key] = newSubObj;
+
+                state.toolboxExecuteOptions = newObj;
+            }
         },
         resetState: (state) => {
             state.toolboxQueryOptions = {};
             state.toolboxQueryProcessing = false;
             state.toolboxQueryReady = false;
-            state.toolboxQueryCtr = 0;
+            state.toolboxExecuteOptions = {};
+            state.toolboxExecuteProcessing = false;
+            state.toolboxExecuteReady = false;
             state.stateReset = true;
         },
     },
@@ -314,7 +440,7 @@ export const toolboxSlice = createSlice({
                 state.error = false;
             })
             .addCase(run.rejected, (state, action) => {
-                if (action.error.message?.includes(MASTER_KEY)) {
+                if (action.error.message?.includes(QUERY_MASTER_KEY)) {
                     state.stateReset = false;
                     state.toolboxQueryOptions = {};
 
@@ -327,7 +453,7 @@ export const toolboxSlice = createSlice({
                                 cmd &&
                                 cmd.length > 0 &&
                                 cmd[1] &&
-                                cmd[1] !== MASTER_KEY
+                                cmd[1] !== QUERY_MASTER_KEY
                             ) {
                                 state.toolboxQueryOptions[cmd[1]] = {};
                             }
@@ -335,6 +461,27 @@ export const toolboxSlice = createSlice({
                     }
 
                     state.toolboxQueryProcessing = true;
+                } else if (action.error.message?.includes(EXECUTE_MASTER_KEY)) {
+                    state.stateReset = false;
+                    state.toolboxExecuteOptions = {};
+
+                    let regExp = /`(.*?)`/g;
+                    let match = [...action.error.message.matchAll(regExp)];
+
+                    if (match && match.length > 0) {
+                        match.forEach((cmd) => {
+                            if (
+                                cmd &&
+                                cmd.length > 0 &&
+                                cmd[1] &&
+                                cmd[1] !== EXECUTE_MASTER_KEY
+                            ) {
+                                state.toolboxExecuteOptions[cmd[1]] = {};
+                            }
+                        });
+                    }
+
+                    state.toolboxExecuteProcessing = true;
                 }
             });
     },
@@ -347,8 +494,10 @@ export const {
     setToolboxQueryProcessing,
     setToolboxQueryReady,
     setToolboxQueryOptions,
-    setToolboxQueryCtr,
-    resetState
+    setToolboxExecuteProcessing,
+    setToolboxExecuteReady,
+    setToolboxExecuteOptions,
+    resetState,
 } = toolboxSlice.actions;
 
 export default toolboxSlice.reducer;

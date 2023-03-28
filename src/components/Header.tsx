@@ -13,10 +13,7 @@ export const Header = () => {
     const dispatch = useAppDispatch();
     return (
         <div className={`${styles.header} border border-bottom`}>
-            <h3 className={styles.name}>
-                cøsmwasm devtøøls <br />
-                <span className={styles.subtext}>(credits to aswever)</span>
-            </h3>
+            <h3 className={styles.name}>cøsmwasm devtøøls</h3>
 
             <div className={styles.subhead}>
                 <a

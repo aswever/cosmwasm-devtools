@@ -7,6 +7,10 @@ import { Provider } from "react-redux";
 import * as serviceWorker from "./serviceWorker";
 import { PersistGate } from "redux-persist/es/integration/react";
 
+import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
+import "primereact/resources/primereact.min.css";                  //core css
+import "primeicons/primeicons.css";                                //icons
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
