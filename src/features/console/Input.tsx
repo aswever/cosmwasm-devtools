@@ -5,7 +5,7 @@ import {
     SlMenu,
     SlMenuItem,
 } from "@shoelace-style/shoelace/dist/react";
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Editor from "react-simple-code-editor";
 import formatHighlight from "json-format-highlight";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -49,9 +49,15 @@ export const Input: FC = () => {
     const [lastContractSelected, setLastContractSelected] = useState<
         string | undefined
     >(undefined);
+
+    const [lineNumbers, setLineNumbers] = useState<JSX.Element[]>([]);
+
+    // used when a user switches contracts. will requery the selected contract
     const selected = useAppSelector((state) => state.accounts.currentContract);
     const stateReset = useAppSelector((state) => state.toolbox.stateReset);
 
+    // query processing handlers
+    // refs so we dont get in a rerender loop
     const queryReady = useRef(false);
     const toolboxQueryExecutedRef = useRef(false);
     const toolboxQueryBuiltRef = useRef(false);
@@ -66,6 +72,8 @@ export const Input: FC = () => {
         (state) => state.toolbox.toolboxQueryOptions
     );
 
+    // execute processing handlers
+    // refs so we dont get in a rerender loop
     const executeReady = useRef(false);
     const toolboxExecuteExecutedRef = useRef(false);
     const toolboxExecuteBuiltRef = useRef(false);
@@ -80,6 +88,7 @@ export const Input: FC = () => {
         (state) => state.toolbox.toolboxExecuteOptions
     );
 
+    // final "cards" that are built
     const [queryCards, setQueryCards] = useState<IDropdownOption[]>([]);
     const [executeCards, setExecuteCards] = useState<IDropdownOption[]>([]);
 
@@ -92,6 +101,7 @@ export const Input: FC = () => {
         dispatch(action);
     }
 
+    // resets toolbox states upon loading the page
     useEffect(() => {
         dispatch(resetState());
         toolboxQueryExecutedRef.current = false;
@@ -103,6 +113,7 @@ export const Input: FC = () => {
         executeReady.current = true;
     }, []);
 
+    // when a contract is switched, we'll reset state
     useEffect(() => {
         if (selected !== lastContractSelected) {
             queryReady.current = false;
@@ -118,6 +129,7 @@ export const Input: FC = () => {
         }
     }, [dispatch, lastContractSelected, selected]);
 
+    // if stateReset is detected, we'll rebuild the toolbox
     useEffect(() => {
         if (stateReset) {
             queryReady.current = true;
@@ -128,6 +140,7 @@ export const Input: FC = () => {
         }
     }, [stateReset]);
 
+    // this hook will iterate through the available options and then populate parameters
     useEffect(() => {
         if (
             queryReady.current &&
@@ -152,6 +165,7 @@ export const Input: FC = () => {
         }
     }, [toolboxQueryProcessing, toolboxQueryOptions, dispatch]);
 
+    // this hook builds the dropdown options
     useEffect(() => {
         if (
             toolboxQueryReady &&
@@ -172,6 +186,7 @@ export const Input: FC = () => {
         }
     }, [toolboxQueryReady, toolboxQueryOptions]);
 
+    // this hook will iterate through the available options and then populate parameters
     useEffect(() => {
         if (
             executeReady.current &&
@@ -200,6 +215,7 @@ export const Input: FC = () => {
         }
     }, [toolboxExecuteProcessing, toolboxExecuteOptions, dispatch]);
 
+    // this hook builds the dropdown options
     useEffect(() => {
         if (
             toolboxExecuteReady &&
@@ -212,6 +228,8 @@ export const Input: FC = () => {
 
             let keys = Object.keys(toolboxExecuteOptions).sort();
 
+            console.log(toolboxExecuteOptions)
+
             for (const key of keys) {
                 eCards.push({ name: key, code: key } as IDropdownOption);
             }
@@ -220,6 +238,7 @@ export const Input: FC = () => {
         }
     }, [toolboxExecuteReady, toolboxExecuteOptions]);
 
+    // if a user selects an option, we'll populate the input
     const setSelectedCard = (selectType: string, opt: IDropdownOption) => {
         let options:
             | {
@@ -241,6 +260,33 @@ export const Input: FC = () => {
         }
     };
 
+    const editorValueChange = (code: string) => {
+        setMessage(code);
+        dispatch(prettifyInput(code));
+
+        let i = 1;
+        let count = code.split("\n").length + 1;
+
+        let _lineNumbers: JSX.Element[] = [];
+
+        while (i < count) {
+            _lineNumbers.push(
+                <div key={i + 1}>
+                    <span className="text-slate-500">
+                        {i}
+                    </span>
+                </div>
+            );
+            i++;
+        }
+
+        setLineNumbers(_lineNumbers);
+    };
+
+    useLayoutEffect(() => {
+        editorValueChange(message)
+    }, [])
+
     return (
         <div className={`${styles.input} flex flex-col`}>
             <div
@@ -255,13 +301,14 @@ export const Input: FC = () => {
                 <div>
                     <span className="text-lg font-bold">Contract Toolbox</span>
                 </div>
-                <div className="flex flex-row gap-4">
+                <div className="flex flex-row gap-4 py-2">
                     <Dropdown
                         onChange={(e) => setSelectedCard("q", e.value)}
                         options={queryCards}
                         optionLabel="name"
                         placeholder="Query Helper"
                         className="w-full"
+                        scrollHeight={"600px"}
                     />
                     <Dropdown
                         onChange={(e) => setSelectedCard("e", e.value)}
@@ -269,17 +316,21 @@ export const Input: FC = () => {
                         optionLabel="name"
                         placeholder="Execute Helper"
                         className="w-full"
+                        scrollHeight={"600px"}
                     />
                 </div>
             </div>
-            <div className="grow h-full">
+            <div className="grow h-full flex flex-row">
+                <div className="h-full w-[2em] py-[10px] pl-[5px]">
+                    <span>{lineNumbers}</span>
+                </div>
                 <Editor
                     className={`${styles.editor}`}
                     highlight={(code) => formatHighlight(code, highlightColors)}
                     placeholder="Enter JSON message"
                     value={message}
                     padding={10}
-                    onValueChange={(code) => setMessage(code)}
+                    onValueChange={(code) => editorValueChange(code)}
                 />
             </div>
             <div className={`${styles.controls} flex-none`}>
@@ -289,7 +340,7 @@ export const Input: FC = () => {
                     <Tooltip target="#tt_id_3" />
                     <SlButton
                         id={"tt_id_1"}
-                        data-pr-tooltip="Formats JSON on screen"
+                        data-pr-tooltip="Formats JSON in the editor"
                         data-pr-position="top"
                         onClick={() => dispatch(prettifyInput(message))}
                     >
