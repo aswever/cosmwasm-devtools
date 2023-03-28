@@ -1,17 +1,9 @@
 import { coins } from "@cosmjs/proto-signing";
-import { serializeSignDoc, Secp256k1HdWallet } from "@cosmjs/launchpad";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppThunk, RootState } from "../../app/store";
 import { toMicroAmount } from "../../util/coins";
-import {
-    selectedAccount,
-    selectedContract,
-    AccountType,
-} from "../accounts/accountsSlice";
+import { selectedAccount, selectedContract } from "../accounts/accountsSlice";
 import connectionManager from "../connection/connectionManager";
-import { StdSignature } from "@cosmjs/amino";
-import { getKeplr } from "../accounts/useKeplr";
-import { makeADR36AminoSignDoc } from "../../util/adr36";
 
 export const highlightColors = {
     keyColor: "black",
@@ -33,13 +25,29 @@ export interface ToolboxState {
     error: boolean;
     optionsOpen: boolean;
     executeOptions?: ExecuteOptions;
+    toolboxQueryOptions: {
+        [key: string]: {
+            [key: string]: {};
+        };
+    };
+    toolboxQueryProcessing: boolean;
+    toolboxQueryReady: boolean;
+    toolboxQueryCtr: number;
+    stateReset: boolean;
 }
+
+const MASTER_KEY: string = "D7DFB68ED7C1BA3C1BA5184251C52";
 
 const initialState: ToolboxState = {
     input: "",
     output: "Response will appear here",
     error: false,
     optionsOpen: false,
+    toolboxQueryOptions: {},
+    toolboxQueryProcessing: false,
+    toolboxQueryReady: false,
+    toolboxQueryCtr: 0,
+    stateReset: false
 };
 
 class ToolboxError extends Error {}
@@ -75,9 +83,11 @@ const run = createAsyncThunk(
 export const buildQueryToolbox = (): AppThunk => (dispatch, getState) => {
     dispatch(
         run(async () => {
-            const queryObj = {
-                intentionally_poWHSIKEYor_query: "",
-            };
+            dispatch(setToolboxQueryProcessing(false));
+            dispatch(setToolboxQueryReady(false));
+
+            let queryObj: { [key: string]: {} } = {};
+            queryObj[MASTER_KEY] = {};
             const contract = selectedContract(getState());
             if (!contract) throw new Error("No contract selected");
             const conn = await connectionManager.getQueryClient(
@@ -90,6 +100,109 @@ export const buildQueryToolbox = (): AppThunk => (dispatch, getState) => {
         })
     );
 };
+
+interface IRunQuery {
+    cmd: string;
+    isLastQuery: boolean;
+}
+
+const runQuery = createAsyncThunk(
+    "toolbox/runQuery",
+    async (command: (msgObj: any) => Promise<any>, { getState, dispatch }) =>
+        //): Promise<string> => {
+        {
+            let result = "";
+            try {
+                let msgObj = {};
+
+                const resObj = await command(msgObj);
+                let iRunQuery = resObj() as IRunQuery;
+
+                let _state = getState() as RootState;
+
+                let queryObj: {
+                    [key: string]: {
+                        [key: string]: {};
+                    };
+                } = {};
+
+                queryObj[iRunQuery.cmd] = {};
+                queryObj[iRunQuery.cmd][MASTER_KEY] = {};
+
+                const contract = selectedContract(_state);
+
+                if (!contract) throw new Error("No contract selected");
+
+                const conn = await connectionManager.getQueryClient(
+                    _state.connection.config
+                );
+
+                const func = new Promise<any>((resolve, reject) => {
+                    resolve(
+                        conn?.client?.wasm.queryContractSmart(
+                            contract.address,
+                            queryObj
+                        )
+                    );
+                });
+
+                let resObj2: any = await func
+                    .then((res) => {
+                        return res;
+                    })
+                    .catch((e2) => {
+                        if ("message" in e2) {
+                            let regExp = /`(.*?)`/g;
+                            let match = [...e2.message.matchAll(regExp)];
+
+                            let toolboxOptions: IToolboxOptions = {
+                                key: iRunQuery.cmd,
+                                options: {},
+                            };
+
+                            if (match && match.length > 0) {
+                                match.forEach((cmd) => {
+                                    if (
+                                        cmd &&
+                                        cmd.length > 0 &&
+                                        cmd[1] &&
+                                        cmd[1] !== MASTER_KEY
+                                    ) {
+                                        toolboxOptions.options[cmd[1]] = "";
+                                    }
+                                });
+                            }
+
+                            dispatch(setToolboxQueryOptions(toolboxOptions));
+
+                            dispatch(setToolboxQueryCtr());
+
+                            if (iRunQuery.isLastQuery) {
+                                dispatch(setToolboxQueryReady(true));
+                            }
+                        }
+                    });
+
+                //result = JSON.stringify(resObj2, null, 2);
+            } catch (e) {}
+
+            //return result;
+        }
+);
+
+export const toolboxQuery =
+    (cmd: string, isLastQuery: boolean): AppThunk =>
+    (dispatch, _) => {
+        dispatch(
+            runQuery(async () => {
+                dispatch(setToolboxQueryReady(false));
+
+                return () => {
+                    return { cmd, isLastQuery };
+                };
+            })
+        );
+    };
 
 export const execute =
     ({
@@ -137,6 +250,13 @@ export const execute =
         );
     };
 
+interface IToolboxOptions {
+    key: string;
+    options: {
+        [key: string]: {};
+    };
+}
+
 export const toolboxSlice = createSlice({
     name: "toolbox",
     initialState,
@@ -150,6 +270,39 @@ export const toolboxSlice = createSlice({
         setExecuteOptions: (state, action: PayloadAction<ExecuteOptions>) => {
             state.executeOptions = action.payload;
         },
+        setToolboxQueryProcessing: (state, action: PayloadAction<boolean>) => {
+            state.toolboxQueryProcessing = action.payload;
+        },
+        setToolboxQueryReady: (state, action: PayloadAction<boolean>) => {
+            state.toolboxQueryReady = action.payload;
+        },
+        setToolboxQueryOptions: (
+            state,
+            action: PayloadAction<IToolboxOptions>
+        ) => {
+            if (action.payload) {
+                let newObj = { ...state.toolboxQueryOptions };
+                let newSubObj = Object.assign(
+                    {},
+                    state.toolboxQueryOptions[action.payload.key] ?? {},
+                    action.payload.options ?? {}
+                );
+
+                newObj[action.payload.key] = newSubObj;
+
+                state.toolboxQueryOptions = newObj;
+            }
+        },
+        setToolboxQueryCtr: (state) => {
+            state.toolboxQueryCtr++;
+        },
+        resetState: (state) => {
+            state.toolboxQueryOptions = {};
+            state.toolboxQueryProcessing = false;
+            state.toolboxQueryReady = false;
+            state.toolboxQueryCtr = 0;
+            state.stateReset = true;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -161,33 +314,41 @@ export const toolboxSlice = createSlice({
                 state.error = false;
             })
             .addCase(run.rejected, (state, action) => {
-                console.log(`action.error.message`);
-                console.log(JSON.stringify(action.error));
-                if (
-                    action.error.message?.includes(
-                        "intentionally_poWHSIKEYor_query"
-                    )
-                ) {
-                    let regExp = new RegExp(
-                        "^(.*?)\\s(expected one of)\\s(.*?)(\\: query wasm)(.*?)$",
-                        "g"
-                    );
+                if (action.error.message?.includes(MASTER_KEY)) {
+                    state.stateReset = false;
+                    state.toolboxQueryOptions = {};
 
-                    let match = regExp.exec(action.error.message)
+                    let regExp = /`(.*?)`/g;
+                    let match = [...action.error.message.matchAll(regExp)];
 
-                    console.log(action)
-
-                    if (match && match.length === 6) {
-                        let queryMsgCommands = match[3].replaceAll('`', '');
-                        console.log(queryMsgCommands)
+                    if (match && match.length > 0) {
+                        match.forEach((cmd) => {
+                            if (
+                                cmd &&
+                                cmd.length > 0 &&
+                                cmd[1] &&
+                                cmd[1] !== MASTER_KEY
+                            ) {
+                                state.toolboxQueryOptions[cmd[1]] = {};
+                            }
+                        });
                     }
+
+                    state.toolboxQueryProcessing = true;
                 }
-                state.output = action.error.message ?? "Error";
-                state.error = true;
             });
     },
 });
 
-export const { setInput, setOutput, setExecuteOptions } = toolboxSlice.actions;
+export const {
+    setInput,
+    setOutput,
+    setExecuteOptions,
+    setToolboxQueryProcessing,
+    setToolboxQueryReady,
+    setToolboxQueryOptions,
+    setToolboxQueryCtr,
+    resetState
+} = toolboxSlice.actions;
 
 export default toolboxSlice.reducer;
