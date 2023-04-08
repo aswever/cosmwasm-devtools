@@ -30,6 +30,7 @@ import {
 
 import { AppThunk } from "../../app/store";
 
+import { Accordion, AccordionTab } from "primereact/accordion";
 import { Dropdown } from "primereact/dropdown";
 import { Tooltip } from "primereact/tooltip";
 
@@ -331,6 +332,15 @@ export const Input: FC = () => {
             >
                 <div>
                     <span className="text-lg font-bold">Contract Toolbox</span>
+                    <Accordion>
+                        <AccordionTab header="How does this work?">
+                            <p className="m-0">
+                                The "toolbox" does a few queries against the selected contract to build the toolbox.  
+                                The helpers also add in optional parameters without types, so the bulk of the work will 
+                                be up to your understanding of the contract you're trying to interact with
+                            </p>
+                        </AccordionTab>
+                    </Accordion>
                 </div>
                 <div className="flex flex-row gap-4 py-2">
                     <Dropdown

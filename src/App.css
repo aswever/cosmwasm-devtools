@@ -71,6 +71,10 @@ sl-divider {
   z-index: 0;
 }
 
+.p-accordion-header-link {
+  height: 32px;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

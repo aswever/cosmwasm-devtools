@@ -551,6 +551,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin: auto;
 }
 
+.m-0 {
+  margin: 0px;
+}
+
 .my-auto {
   margin-top: auto;
   margin-bottom: auto;
